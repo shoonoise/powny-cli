@@ -29,7 +29,7 @@ def file_loader(file_name, loaders):
         logging.error("Can't open file %s" % file_name)
         raise
     else:
-        exp = Exception()
+        exp = BaseException()
         result_dict = {}
 
         for loader in loaders:
@@ -44,12 +44,8 @@ def file_loader(file_name, loaders):
             return result_dict
 
 
-def config_alerts(conf=None):
-    if conf:
-        setup_config(file_loader(conf, (json.loads, yaml.load)))
-    else:
-        setup_config({'output':
-                     {'email': {'server': 'gns-testing.haze.yandex.net'}}})
+def config_alerts(conf):
+    setup_config(file_loader(conf, (json.loads, yaml.load)))
 
 
 def import_module(name):
@@ -78,8 +74,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run GNS rules locally.')
     parser.add_argument('-e', '--event-desc', required=True, help="JSON/YAML file with event description")
     parser.add_argument('-r', '--rule-path', required=True, help="Importable test rule module name")
-    parser.add_argument('-c', '--config', help="Config for email/sms alerts")
+    parser.add_argument('-c', '--config', required=True, help="Config for email/sms alerts")
     args = parser.parse_args()
+
+    logging.config.dictConfig(file_loader(args.config, (yaml.load,)).get('logging'))
 
     monkey_patch()
     config_alerts(args.config)
