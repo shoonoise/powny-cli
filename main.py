@@ -2,6 +2,7 @@ import json
 import uuid
 import argparse
 import yaml
+import logging
 from raava.rules import get_handlers
 from raava.rules import EventRoot
 from gns.env import setup_config
@@ -20,21 +21,32 @@ def monkey_patch():
     raava.worker = Mock()
 
 
+def file_loader(file_name, loaders):
+    try:
+        with open(file_name) as f:
+            result = f.read()
+    except Exception:
+        logging.error("Can't open file %s" % file_name)
+        raise
+    else:
+        exp = Exception()
+        result_dict = {}
+
+        for loader in loaders:
+            try:
+                result_dict = loader(result)
+            except Exception as e:
+                exp = e
+
+        if not result_dict:
+            raise ("Can't parse file: %s" % file_name) from exp
+        else:
+            return result_dict
+
+
 def config_alerts(conf=None):
     if conf:
-        try:
-            with open(conf) as config_file:
-                conf_ = config_file.read()
-        except Exception:
-            print("Can't read config file")
-            raise
-        else:
-            try:
-                conf_dict = yaml.load(conf_)
-            except ValueError as e:
-                raise RuntimeError("Can't parse config.", e)
-            else:
-                setup_config(conf_dict)
+        setup_config(file_loader(conf, (json.loads, yaml.load)))
     else:
         setup_config({'output':
                      {'email': {'server': 'gns-testing.haze.yandex.net'}}})
@@ -50,30 +62,8 @@ def get_event_root(event_desc):
     event.set_extra({'handler': 'on_event',
                      'job_id': str(uuid.uuid4()),
                      'counter': 0})
-    description = {}
 
-    try:
-        with open(event_desc) as event_desc_file:
-            event_desc_ = event_desc_file.read()
-    except Exception:
-        print("Can't open event description file.")
-        raise
-    else:
-        exp = None
-        try:
-            description = json.loads(event_desc_)
-        except ValueError as e1:
-            exp = e1
-            try:
-                description = yaml.load(event_desc_)
-            except ValueError as e2:
-                exp = e2
-        finally:
-            if description:
-                event.update(description)
-            else:
-                raise RuntimeError("Can't parse event description", exp)
-
+    event.update(file_loader(event_desc, (yaml.load,)))
     return event
 
 
