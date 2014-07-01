@@ -21,31 +21,31 @@ def monkey_patch():
     raava.worker = Mock()
 
 
-def file_loader(file_name, loaders):
+def load_file(file_name, loaders):
     try:
         with open(file_name) as f:
-            result = f.read()
+            content = f.read()
     except Exception:
-        logging.error("Can't open file %s" % file_name)
+        logging.error("Can't open file %s", file_name)
         raise
     else:
         exp = BaseException()
-        result_dict = {}
+        parsed_content = {}
 
         for loader in loaders:
             try:
-                result_dict = loader(result)
+                parsed_content = loader(content)
             except Exception as e:
                 exp = e
 
-        if not result_dict:
-            raise ("Can't parse file: %s" % file_name) from exp
+        if not parsed_content:
+            raise ("Can't parse file: %s", file_name) from exp
         else:
-            return result_dict
+            return parsed_content
 
 
 def config_alerts(conf):
-    setup_config(file_loader(conf, (json.loads, yaml.load)))
+    setup_config(load_file(conf, (json.loads, yaml.load)))
 
 
 def import_module(name):
@@ -59,7 +59,7 @@ def get_event_root(event_desc):
                      'job_id': str(uuid.uuid4()),
                      'counter': 0})
 
-    event.update(file_loader(event_desc, (yaml.load,)))
+    event.update(load_file(event_desc, (yaml.load,)))
     return event
 
 
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     parser.add_argument('-c', '--config', required=True, help="Config for email/sms alerts")
     args = parser.parse_args()
 
-    logging.config.dictConfig(file_loader(args.config, (yaml.load,)).get('logging'))
+    logging.config.dictConfig(load_file(args.config, (yaml.load,)).get('logging'))
 
     monkey_patch()
     config_alerts(args.config)
