@@ -76,7 +76,7 @@ def check_rule(event_root, handlers):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Run GNS rules locally.')
-    parser.add_argument('-e', '--event-desc', required=True, help="JSON file with event description")
+    parser.add_argument('-e', '--event-desc', required=True, help="JSON/YAML file with event description")
     parser.add_argument('-r', '--rule-path', required=True, help="Importable test rule module name")
     parser.add_argument('-c', '--config', help="Config for email/sms alerts")
     args = parser.parse_args()
