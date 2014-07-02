@@ -61,7 +61,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Run GNS rules locally.')
     parser.add_argument('-e', '--event-desc', required=True, help="JSON file with event description")
-    parser.add_argument('-r', '--rule_name', required=True, help="Importable test rule module name")
+    parser.add_argument('-r', '--rule-name', required=True, help="Importable test rule module name")
     parser.add_argument('-c', '--config', help="Config for email/sms alerts")
     args = parser.parse_args()
 
