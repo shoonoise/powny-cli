@@ -15,8 +15,14 @@ from pkg_resources import resource_stream
 
 
 def monkey_patch():
-
+    """
+    Patch raava worker to avoid import issue
+    """
     class Mock():
+
+        def __init__(self):
+            pass
+
         def checkpoint(self):
             pass
 
@@ -27,6 +33,11 @@ def monkey_patch():
 
 
 def import_module(path_to_module):
+    """
+    Import modules from path
+    returns set of functions named 'on_event'
+    which fined in path
+    """
     checked_fn_name = 'on_event'
     abspath_to_module = os.path.abspath(path_to_module)
     sys.path.append(abspath_to_module)
@@ -39,6 +50,9 @@ def import_module(path_to_module):
 
 
 def get_event_root(event_desc):
+    """
+    Return event object, which GNS expected
+    """
     event = EventRoot()
     event.set_extra({'handler': 'on_event',
                      'job_id': str(uuid.uuid4()),
@@ -54,6 +68,10 @@ def get_default_config():
 
 
 def check_rule(event_root, handlers):
+    """
+    Search for jobs which mapped for this event
+    and execute it
+    """
     matched_tasks = get_handlers(event_root, {'on_event': handlers})
     for task in matched_tasks:
         task(event_root)
@@ -77,7 +95,6 @@ def main():
         event_desc = json.loads(sys.stdin.read())
     else:
         event_desc = json.loads(open(args.event_desc).read())
-
 
     # setup logging and output(sms, email, etc) configs
     logging.config.dictConfig(config.get('logging'))
