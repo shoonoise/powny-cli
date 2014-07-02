@@ -1,6 +1,6 @@
 output:
     email:
-      server: %%FIX_ME%%
+      server: localhost
 
 logging:
     version: 1
