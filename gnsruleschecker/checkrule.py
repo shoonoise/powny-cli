@@ -2,6 +2,7 @@ import json
 import os
 import uuid
 import argparse
+import sys
 import yaml
 import logging
 import importlib
@@ -10,6 +11,7 @@ import raava
 from raava.rules import get_handlers
 from raava.rules import EventRoot
 from gns.env import setup_config
+from pkg_resources import resource_stream
 
 
 def monkey_patch():
@@ -22,33 +24,6 @@ def monkey_patch():
             return self
 
     raava.worker = Mock()
-
-
-def load_file(file_name, loaders):
-    try:
-        with open(file_name) as f:
-            content = f.read()
-    except BaseException:
-        logging.error("Can't open file %s", file_name)
-        raise
-    else:
-        exp = None
-        parsed_content = {}
-
-        for loader in loaders:
-            try:
-                parsed_content = loader(content)
-            except BaseException as e:
-                exp = e
-
-        if not parsed_content:
-            raise RuntimeError("Can't parse file: %s", file_name) from exp
-        else:
-            return parsed_content
-
-
-def config_alerts(conf):
-    setup_config(load_file(conf, (json.loads, yaml.load)))
 
 
 def import_module(name):
@@ -66,8 +41,13 @@ def get_event_root(event_desc):
                      'job_id': str(uuid.uuid4()),
                      'counter': 0})
 
-    event.update(load_file(event_desc, (yaml.load,)))
+    event.update(event_desc)
     return event
+
+
+def get_default_config():
+    config_stream = resource_stream(__name__, 'config.yaml')
+    return config_stream
 
 
 def check_rule(event_root, handlers):
@@ -77,21 +57,33 @@ def check_rule(event_root, handlers):
 
 
 def main():
+    monkey_patch()
+
     parser = argparse.ArgumentParser(description='Run GNS rules locally.')
-    parser.add_argument('-e', '--event-desc', required=True, help="JSON/YAML file with event description")
-    parser.add_argument('-r', '--rule-path', required=True, help="Importable test rule module name")
-    parser.add_argument('-c', '--config', required=True, help="Config for email/sms alerts")
+    parser.add_argument('-e', '--event-desc', required=True, help="JSON file with event description")
+    parser.add_argument('-r', '--rule_name', required=True, help="Importable test rule module name")
+    parser.add_argument('-c', '--config', help="Config for email/sms alerts")
     args = parser.parse_args()
 
-    logging.config.dictConfig(load_file(args.config, (yaml.load,)).get('logging'))
+    if args.config:
+        config = yaml.load(open(args.config))
+    else:
+        config = yaml.load(get_default_config())
 
-    monkey_patch()
-    config_alerts(args.config)
+    if args.event_desc == '-':
+        event_desc = json.loads(sys.stdin.read())
+    else:
+        event_desc = json.loads(open(args.event_desc))
 
-    handlers_to_check = set()
-    handlers_to_check.add(import_module(args.rule_path))
 
-    check_rule(get_event_root(args.event_desc), handlers_to_check)
+    # setup logging and output(sms, email, etc) configs
+    logging.config.dictConfig(config.get('logging'))
+    setup_config(config.get('output'))
+
+    handlers_to_check = {import_module(args.rule_name)}
+
+    check_rule(get_event_root(event_desc), handlers_to_check)
+
 
 if __name__ == "__main__":
     main()
