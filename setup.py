@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='gns-rules-checker',
-      version='0.1',
+      version='0.2',
       description='Tool to check GNS rules locally',
       author='Alexander Kushnarev',
       author_email='avkushnarev@gmail.com',
