@@ -5,11 +5,11 @@ import argparse
 import sys
 import yaml
 import logging
-import importlib
 import raava
 
 from raava.rules import get_handlers
 from raava.rules import EventRoot
+from raava.handlers import Loader
 from gns.env import setup_config
 from pkg_resources import resource_stream
 
@@ -26,13 +26,16 @@ def monkey_patch():
     raava.worker = Mock()
 
 
-def import_module(name):
-    module = importlib.find_loader(name, [os.getcwd()])
-    if not module:
-        raise ImportError("Can't import module %s" % name)
+def import_module(path_to_module):
+    checked_fn_name = 'on_event'
+    abspath_to_module = os.path.abspath(path_to_module)
+    sys.path.append(abspath_to_module)
+    loader = Loader(abspath_to_module, [checked_fn_name])
+    functions_to_check = loader.get_handlers('').get(checked_fn_name)
+    if not functions_to_check:
+        raise RuntimeError("Can't find function {name}".format(name=checked_fn_name))
     else:
-        test_module = module.load_module()
-    return test_module.on_event
+        return functions_to_check
 
 
 def get_event_root(event_desc):
@@ -61,7 +64,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Run GNS rules locally.')
     parser.add_argument('-e', '--event-desc', required=True, help="JSON file with event description")
-    parser.add_argument('-r', '--rule-name', required=True, help="Importable test rule module name")
+    parser.add_argument('-r', '--rule-path', required=True, help="Path to package with tested rules")
     parser.add_argument('-c', '--config', help="Config for email/sms alerts")
     args = parser.parse_args()
 
@@ -73,16 +76,14 @@ def main():
     if args.event_desc == '-':
         event_desc = json.loads(sys.stdin.read())
     else:
-        event_desc = json.loads(open(args.event_desc))
+        event_desc = json.loads(open(args.event_desc).read())
 
 
     # setup logging and output(sms, email, etc) configs
     logging.config.dictConfig(config.get('logging'))
     setup_config(config.get('output'))
 
-    handlers_to_check = {import_module(args.rule_name)}
-
-    check_rule(get_event_root(event_desc), handlers_to_check)
+    check_rule(get_event_root(event_desc), import_module(args.rule_path))
 
 
 if __name__ == "__main__":
