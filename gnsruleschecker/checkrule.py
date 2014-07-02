@@ -5,13 +5,14 @@ import argparse
 import yaml
 import logging
 import importlib
+import raava
+
 from raava.rules import get_handlers
 from raava.rules import EventRoot
 from gns.env import setup_config
 
 
 def monkey_patch():
-    import raava
 
     class Mock():
         def checkpoint(self):
