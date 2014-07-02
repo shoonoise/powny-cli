@@ -1,8 +1,10 @@
 import json
+import os
 import uuid
 import argparse
 import yaml
 import logging
+import importlib
 from raava.rules import get_handlers
 from raava.rules import EventRoot
 from gns.env import setup_config
@@ -25,21 +27,21 @@ def load_file(file_name, loaders):
     try:
         with open(file_name) as f:
             content = f.read()
-    except Exception:
+    except BaseException:
         logging.error("Can't open file %s", file_name)
         raise
     else:
-        exp = BaseException()
+        exp = None
         parsed_content = {}
 
         for loader in loaders:
             try:
                 parsed_content = loader(content)
-            except Exception as e:
+            except BaseException as e:
                 exp = e
 
         if not parsed_content:
-            raise ("Can't parse file: %s", file_name) from exp
+            raise RuntimeError("Can't parse file: %s", file_name) from exp
         else:
             return parsed_content
 
@@ -49,8 +51,12 @@ def config_alerts(conf):
 
 
 def import_module(name):
-    module = __import__(name)
-    return module.on_event
+    module = importlib.find_loader(name, [os.getcwd()])
+    if not module:
+        raise ImportError("Can't import module %s" % name)
+    else:
+        test_module = module.load_module()
+    return test_module.on_event
 
 
 def get_event_root(event_desc):
@@ -69,8 +75,7 @@ def check_rule(event_root, handlers):
         task(event_root)
 
 
-if __name__ == "__main__":
-
+def main():
     parser = argparse.ArgumentParser(description='Run GNS rules locally.')
     parser.add_argument('-e', '--event-desc', required=True, help="JSON/YAML file with event description")
     parser.add_argument('-r', '--rule-path', required=True, help="Importable test rule module name")
@@ -86,3 +91,6 @@ if __name__ == "__main__":
     handlers_to_check.add(import_module(args.rule_path))
 
     check_rule(get_event_root(args.event_desc), handlers_to_check)
+
+if __name__ == "__main__":
+    main()
