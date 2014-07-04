@@ -69,7 +69,7 @@ def get_default_config():
 
 def check_rule(event_root, handlers):
     """
-    Search for jobs which mapped for this event
+    Search for functions in GNS, which mapped for this event
     and execute it
     """
     matched_tasks = get_handlers(event_root, {'on_event': handlers})
@@ -78,8 +78,6 @@ def check_rule(event_root, handlers):
 
 
 def main():
-    monkey_patch()
-
     parser = argparse.ArgumentParser(description='Run GNS rules locally.')
     parser.add_argument('-e', '--event-desc', required=True, help="JSON file with event description")
     parser.add_argument('-r', '--rule-path', required=True, help="Path to package with tested rules")
@@ -98,10 +96,10 @@ def main():
 
     # setup logging and output(sms, email, etc) configs
     logging.config.dictConfig(config.get('logging'))
-    setup_config(config.get('output'))
+    setup_config(config)
+    monkey_patch()
 
     check_rule(get_event_root(event_desc), import_module(args.rule_path))
-
 
 if __name__ == "__main__":
     main()
