@@ -3,7 +3,7 @@ python:
   - 3.3
   - 3.4
 install:
-    - pip install tox
+    - pip install tox raava gns
 script:
     - python -m tox
 notifications:
