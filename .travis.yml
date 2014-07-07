@@ -3,9 +3,9 @@ python:
   - 3.3
   - 3.4
 install:
-    - pip3 install tox
+    - pip install tox
 script:
-    - python3 tox
+    - python tox
 notifications:
     hipchat:
         rooms:
