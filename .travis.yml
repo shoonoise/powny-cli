@@ -5,7 +5,7 @@ python:
 install:
     - pip install tox
 script:
-    - python tox
+    - python -m tox
 notifications:
     hipchat:
         rooms:
