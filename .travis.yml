@@ -3,9 +3,9 @@ python:
   - 3.3
   - 3.4
 install:
-    - pip install tox raava gns
+    - pip install tox
 script:
-    - python -m tox
+    - python -m tox -v
 notifications:
     hipchat:
         rooms:
