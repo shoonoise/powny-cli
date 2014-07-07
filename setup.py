@@ -11,4 +11,4 @@ setup(name='gns-rules-checker',
       packages=['gnsruleschecker'],
       package_data={'gnsruleschecker': ['config.yaml']},
       entry_points={'console_scripts': ['gns_checker = gnsruleschecker.checkrule:main']},
-      requires=['gns'])
+      install_requires=['gns'])
