@@ -10,5 +10,5 @@ setup(name='gns-rules-checker',
       url='https://github.com/yandex-sysmon/gns-rules-checker',
       packages=['gnsruleschecker'],
       package_data={'gnsruleschecker': ['config.yaml']},
-      entry_points={'console_scripts': ['gns_checker = gnsruleschecker.checkrule:main']},
+      entry_points={'console_scripts': ['gns-check = gnsruleschecker.checkrule:main']},
       install_requires=['gns'])
