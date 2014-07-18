@@ -3,12 +3,12 @@
 from setuptools import setup
 
 setup(name='gns-rules-checker',
-      version='0.3',
+      version='0.4',
       description='Tool to check GNS rules locally',
       author='Alexander Kushnarev',
       author_email='avkushnarev@gmail.com',
       url='https://github.com/yandex-sysmon/gns-rules-checker',
       packages=['gnsruleschecker'],
       package_data={'gnsruleschecker': ['config.yaml']},
-      entry_points={'console_scripts': ['gns-check = gnsruleschecker.checkrule:main']},
-      install_requires=['gns'])
+      entry_points={'console_scripts': ['gns-checker = gnsruleschecker.checkrule:main']},
+      install_requires=['gns', 'raava', 'yaml'])
