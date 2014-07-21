@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='gns-rules-checker',
-      version='0.4',
+      version='0.5',
       description='Tool to check GNS rules locally',
       author='Alexander Kushnarev',
       author_email='avkushnarev@gmail.com',
@@ -11,4 +11,4 @@ setup(name='gns-rules-checker',
       packages=['gnsruleschecker'],
       package_data={'gnsruleschecker': ['config.yaml']},
       entry_points={'console_scripts': ['gns-checker = gnsruleschecker.checkrule:main']},
-      install_requires=['gns', 'raava', 'yaml'])
+      install_requires=['gns', 'raava', 'pyyaml'])
