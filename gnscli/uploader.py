@@ -5,12 +5,9 @@ This module is for upload updated or new rules to GNS.
 import envoy
 from gnscli import gnsapi
 import logging
-from gnscli.settings import Config
+from gnscli.settings import Settings
 
 LOG = logging.getLogger(__name__)
-
-GIT_OK = 0
-GIT_WARN = 1
 
 
 class UploadRulesException(Exception):
@@ -30,13 +27,14 @@ def _update_head(gns_server: str, path):
 
 
 def _execute_git_command(cmd: str, extra: dict, err_msg: str):
+    git_warn_exit_code = 1
     full_cmd = 'git --git-dir={path}/.git --work-tree={path} {cmd}'.format(cmd=cmd, **extra)
     LOG.debug("Execute command: %s", full_cmd)
     result = envoy.run(full_cmd)
     out, err, exit_code = result.std_out, result.std_err, result.status_code
-    if exit_code > GIT_WARN:
+    if exit_code > git_warn_exit_code:
         raise UploadRulesException(err_msg, err, out, full_cmd)
-    elif exit_code == GIT_WARN:
+    elif exit_code == git_warn_exit_code:
         LOG.warning("%s\n%s", err, out)
         return out
     else:
@@ -68,7 +66,7 @@ def upload(gns_server, path, message):
     _execute_git_command(cmd='push', extra={'path': path},
                          err_msg="Can't push your changes")
 
-    gns_repos = Config.get_conf().get("gns_git_remotes")
+    gns_repos = Settings.config.get("gns_git_remotes")
     for repo in gns_repos:
         LOG.info("Upload rules to {}...".format(repo))
         _execute_git_command(cmd='push {} master'.format(repo), extra={'path': path},

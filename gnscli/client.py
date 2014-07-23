@@ -22,7 +22,7 @@ def _validate_repo_path(_, value):
 
 @click.group()
 @click.option('--debug/--no-debug', default=False)
-@click.option('--config', '-c', type=click.File('r'), callback=settings.Config.load_from_option)
+@click.option('--config', '-c', type=click.File('r'), callback=settings.Settings.load)
 def cli(debug, config):
     """
     GNS command line tool.
