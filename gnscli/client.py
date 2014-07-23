@@ -50,11 +50,7 @@ def upload(gns_server, rules_path, message):
     Upload new or changed rules in GNS
     """
     LOG.info("Upload updated rules to GNS...")
-    try:
-        uploader.upload(gns_server, rules_path, message)
-    except uploader.UploadRulesException as error:
-        LOG.error("Error occurred while rules upload. %s", error)
-        sys.exit(1)
+    uploader.upload(gns_server, rules_path, message)
 
 
 @cli.group()
@@ -67,25 +63,15 @@ def gns():
 @gns.command()
 @click.option('--gns-server', envvar='GNS_SERVER', required=True, help="GNS FQDN")
 def cluster_info(gns_server):
-    try:
-        gns_state = gnsapi.get_cluster_info(gns_server)
-    except gnsapi.GNSAPIException as error:
-        LOG.error("Can't execute GNS API call. %s", error)
-        sys.exit(1)
-    else:
-        click.echo(pprint.pformat(gns_state))
+    gns_state = gnsapi.get_cluster_info(gns_server)
+    click.echo(pprint.pformat(gns_state))
 
 
 @gns.command()
 @click.option('--gns-server', envvar='GNS_SERVER', required=True, help="GNS FQDN")
 def jobs_list(gns_server):
-    try:
-        jobs = gnsapi.get_jobs(gns_server)
-    except gnsapi.GNSAPIException as error:
-        LOG.error("Can't execute GNS API call. %s", error)
-        sys.exit(1)
-    else:
-        click.echo(pprint.pformat(jobs))
+    jobs = gnsapi.get_jobs(gns_server)
+    click.echo(pprint.pformat(jobs))
 
 
 @gns.command()
@@ -97,11 +83,7 @@ def kill_job(gns_server, job_id):
     Now, by GNS API limitation, job just marked as `should be deleted`,
     physically it could be deleted for several time or never.
     """
-    try:
-        gnsapi.terminate_job(gns_server, job_id)
-    except gnsapi.GNSAPIException as error:
-        LOG.error("Can't execute GNS API call. %s", error)
-        sys.exit(1)
+    gnsapi.terminate_job(gns_server, job_id)
 
 
 @gns.command()
@@ -127,11 +109,11 @@ def send_event(host, service, severity, file, gns_server):
 
     LOG.info("Send event: {}".format(pprint.pformat(event)))
 
-    try:
-        gnsapi.send_event(gns_server, event)
-    except gnsapi.GNSAPIException as error:
-        LOG.error("Can't execute GNS API call. %s", error)
-        sys.exit(1)
+    gnsapi.send_event(gns_server, event)
 
 if __name__ == "__main__":
-    cli()
+    try:
+        cli()
+    except (gnsapi.GNSAPIException, uploader.GitCommandError) as error:
+        LOG.error("Error occurred: %s", error)
+        sys.exit(1)

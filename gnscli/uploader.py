@@ -10,7 +10,7 @@ from gnscli.settings import Settings
 LOG = logging.getLogger(__name__)
 
 
-class UploadRulesException(Exception):
+class GitCommandError(Exception):
     pass
 
 
@@ -20,10 +20,7 @@ def _update_head(gns_server: str, path):
     if new_head == current_head:
         LOG.info("HEAD already updated")
         return
-    try:
-        gnsapi.set_header(gns_server, new_head)
-    except gnsapi.GNSAPIException:
-        raise UploadRulesException("Can't update HEAD")
+    gnsapi.set_header(gns_server, new_head)
 
 
 def _execute_git_command(cmd: str, extra: dict, err_msg: str):
@@ -33,7 +30,7 @@ def _execute_git_command(cmd: str, extra: dict, err_msg: str):
     result = envoy.run(full_cmd)
     out, err, exit_code = result.std_out, result.std_err, result.status_code
     if exit_code > git_warn_exit_code:
-        raise UploadRulesException(err_msg, err, out, full_cmd)
+        raise GitCommandError(err_msg, err, out, full_cmd)
     elif exit_code == git_warn_exit_code:
         LOG.warning("%s\n%s", err, out)
         return out
