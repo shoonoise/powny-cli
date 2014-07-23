@@ -29,13 +29,13 @@ def _execute_git_command(cmd: str, extra: dict, err_msg: str):
     logger.debug("Execute command: %s", full_cmd)
     result = envoy.run(full_cmd)
     out, err, exit_code = result.std_out, result.std_err, result.status_code
+    logger.debug(out)
     if exit_code > git_warn_exit_code:
         raise GitCommandError(err_msg, err, out, full_cmd)
     elif exit_code == git_warn_exit_code:
-        logger.warning("%s\n%s", err, out)
+        logger.warning("Git: %s", err)
         return out
     else:
-        logger.info(out)
         return out
 
 
