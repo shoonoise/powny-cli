@@ -1,6 +1,7 @@
 import json
 import click
 import os
+import sys
 from gnscli import uploader
 from gnscli import gnsapi
 import logging
@@ -51,6 +52,7 @@ def upload(gns_server, rules_path, message):
         uploader.upload(gns_server, rules_path, message)
     except uploader.UploadRulesException as error:
         LOG.error("Error occurred while rules upload. %s", error)
+        sys.exit(1)
 
 
 @cli.group()
@@ -67,6 +69,7 @@ def cluster_info(gns_server):
         gns_state = gnsapi.get_cluster_info(gns_server)
     except gnsapi.GNSAPIException as error:
         LOG.error("Can't execute GNS API call. %s", error)
+        sys.exit(1)
     else:
         click.echo(pprint.pformat(gns_state))
 
@@ -78,6 +81,7 @@ def jobs_list(gns_server):
         jobs = gnsapi.get_jobs(gns_server)
     except gnsapi.GNSAPIException as error:
         LOG.error("Can't execute GNS API call. %s", error)
+        sys.exit(1)
     else:
         click.echo(pprint.pformat(jobs))
 
@@ -95,6 +99,7 @@ def kill_job(gns_server, job_id):
         gnsapi.terminate_job(gns_server, job_id)
     except gnsapi.GNSAPIException as error:
         LOG.error("Can't execute GNS API call. %s", error)
+        sys.exit(1)
 
 
 @gns.command()
@@ -116,7 +121,7 @@ def send_event(host, service, severity, file, gns_server):
         event = {'host': host, 'service': service, 'severity': severity}
     else:
         LOG.error("You mast pass `host service severity` args or --file option")
-        return
+        sys.exit(1)
 
     LOG.info("Send event: {}".format(pprint.pformat(event)))
 
@@ -124,7 +129,7 @@ def send_event(host, service, severity, file, gns_server):
         gnsapi.send_event(gns_server, event)
     except gnsapi.GNSAPIException as error:
         LOG.error("Can't execute GNS API call. %s", error)
-
+        sys.exit(1)
 
 if __name__ == "__main__":
     cli()
