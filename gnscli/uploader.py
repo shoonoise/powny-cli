@@ -5,7 +5,7 @@ This module is for upload updated or new rules to GNS.
 import envoy
 from gnscli import gnsapi
 import logging
-from gnscli.settings import get_config
+from gnscli.settings import Config
 
 LOG = logging.getLogger(__name__)
 
@@ -68,7 +68,7 @@ def upload(gns_server, path, message):
     _execute_git_command(cmd='push', extra={'path': path},
                          err_msg="Can't push your changes")
 
-    gns_repos = get_config().get("gns_git_remotes")
+    gns_repos = Config.get_conf().get("gns_git_remotes")
     for repo in gns_repos:
         LOG.info("Upload rules to {}...".format(repo))
         _execute_git_command(cmd='push {} master'.format(repo), extra={'path': path},

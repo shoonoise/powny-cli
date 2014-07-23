@@ -2,10 +2,11 @@ import json
 import click
 import os
 import sys
-from gnscli import uploader
-from gnscli import gnsapi
 import logging
 import pprint
+from gnscli import uploader
+from gnscli import gnsapi
+from gnscli import settings
 
 
 LOG = logging.getLogger(__name__)
@@ -21,7 +22,8 @@ def _validate_repo_path(_, value):
 
 @click.group()
 @click.option('--debug/--no-debug', default=False)
-def cli(debug: bool):
+@click.option('--config', '-c', type=click.File('r'), callback=settings.Config.load_from_option)
+def cli(debug, config):
     """
     GNS command line tool.
     """
