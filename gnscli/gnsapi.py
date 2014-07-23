@@ -5,15 +5,18 @@ This module is wrapper to GNS REST API.
 import json
 import requests
 from requests.compat import urljoin
-from gnscli.log import LOG
+import logging
+
+
+LOG = logging.getLogger(__name__)
 
 
 class GNSAPIException(Exception):
     pass
 
 
-def get_cluster_info(gns_api_url: str):
-    resp = requests.get(urljoin(gns_api_url, '/api/rest/v1/system/state'))
+def get_cluster_info(gns_server: str):
+    resp = requests.get(urljoin(gns_server, '/api/rest/v1/system/state'))
     try:
         resp.raise_for_status()
     except requests.HTTPError:
@@ -22,8 +25,8 @@ def get_cluster_info(gns_api_url: str):
         return resp.json()
 
 
-def send_event(gns_api_url: str, event_desc: dict):
-    resp = requests.post(urljoin(gns_api_url, '/api/rest/v1/jobs'),
+def send_event(gns_server: str, event_desc: dict):
+    resp = requests.post(urljoin(gns_server, '/api/rest/v1/jobs'),
                          headers={'content-type': 'application/json'},
                          data=json.dumps(event_desc))
     try:

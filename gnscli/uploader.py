@@ -4,8 +4,10 @@ This module is for upload updated or new rules to GNS.
 
 import envoy
 from gnscli import gnsapi
-from gnscli.log import LOG
-from gnscli.settings import GNS_REPOS
+import logging
+from gnscli.settings import get_config
+
+LOG = logging.getLogger(__name__)
 
 
 class UploadRulesException(Exception):
@@ -25,12 +27,12 @@ def _update_head(gns_server: str, path):
 
 
 def _execute_git_command(cmd: str, extra: dict, err_msg: str):
-    full_cmd = 'git --git-dir={path}/.git --work-tree={path} {cmd}'.format(   # pylint: disable=W0142
-        cmd=cmd, **extra)
+    full_cmd = 'git --git-dir={path}/.git --work-tree={path} {cmd}'.format(cmd=cmd, **extra)
     result = envoy.run(full_cmd)
     if result.status_code > 10:
         raise UploadRulesException(err_msg, result.std_err, result.std_out, full_cmd)
     else:
+        LOG.debug("Execute command: %s", full_cmd)
         LOG.info(result.std_out)
         return result.std_out
 
@@ -39,10 +41,9 @@ def main(gns_server, path, message):
 
     status = _execute_git_command(cmd='status', extra={'path': path}, err_msg="Can't get git status").split('\n')
 
-    if "nothing to commit, working directory clean" in status[3]:
+    if 'nothing to commit, working directory clean' in status[3]:
         LOG.info("There is no changes.")
 
-    LOG.info("Upload updated rules to GNS...")
     LOG.info("Commit current changes...")
 
     msg = message
@@ -60,9 +61,10 @@ def main(gns_server, path, message):
     _execute_git_command(cmd='push', extra={'path': path},
                          err_msg="Can't push your changes")
 
-    for repo in GNS_REPOS:
+    gns_repos = get_config().get("gns_git_remotes")
+    for repo in gns_repos:
         LOG.info("Upload rules to {}...".format(repo))
-        _execute_git_command(cmd='git push {} master'.format(repo), extra={'path': path},
+        _execute_git_command(cmd='push {} master'.format(repo), extra={'path': path},
                              err_msg="")
 
     _update_head(gns_server, path)

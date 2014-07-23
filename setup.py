@@ -11,4 +11,4 @@ setup(name='gns-rules-checker',
       packages=['gnsruleschecker', 'gnscli'],
       package_data={'gnsruleschecker': ['config.yaml'], 'gnscli': ['config.yaml']},
       entry_points={'console_scripts': ['gns-checker = gnsruleschecker.checkrule:main', 'gns-cli = gnscli.client.cli']},
-      install_requires=['gns', 'raava', 'pyyaml', 'click', 'envoy-beta', 'logbook', 'requests'])
+      install_requires=['gns', 'raava', 'pyyaml', 'click', 'envoy-beta', 'requests'])
