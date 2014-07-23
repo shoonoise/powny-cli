@@ -9,6 +9,9 @@ from gnscli.settings import get_config
 
 LOG = logging.getLogger(__name__)
 
+GIT_OK = 0
+GIT_WARN = 1
+
 
 class UploadRulesException(Exception):
     pass
@@ -28,13 +31,17 @@ def _update_head(gns_server: str, path):
 
 def _execute_git_command(cmd: str, extra: dict, err_msg: str):
     full_cmd = 'git --git-dir={path}/.git --work-tree={path} {cmd}'.format(cmd=cmd, **extra)
+    LOG.debug("Execute command: %s", full_cmd)
     result = envoy.run(full_cmd)
-    if result.status_code > 10:
-        raise UploadRulesException(err_msg, result.std_err, result.std_out, full_cmd)
+    out, err, exit_code = result.std_out, result.std_err, result.status_code
+    if exit_code > GIT_WARN:
+        raise UploadRulesException(err_msg, err, out, full_cmd)
+    elif exit_code == GIT_WARN:
+        LOG.warning("%s\n%s", err, out)
+        return out
     else:
-        LOG.debug("Execute command: %s", full_cmd)
-        LOG.info(result.std_out)
-        return result.std_out
+        LOG.info(out)
+        return out
 
 
 def upload(gns_server, path, message):
