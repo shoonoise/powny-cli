@@ -68,3 +68,13 @@ def get_header(gns_server: str):
         raise GNSAPIException("Can't upload new HEAD.")
     else:
         return resp.json().get('head')
+
+
+def get_jobs(gns_server: str):
+    resp = requests.get(urljoin(gns_server, '/api/rest/v1/jobs'))
+    try:
+        resp.raise_for_status()
+    except requests.HTTPError:
+        raise GNSAPIException("Can't get jobs list")
+    else:
+        return resp.json()

@@ -55,11 +55,17 @@ def gns():
 @click.option('--gns-server', envvar='GNS_SERVER', required=True, help="GNS FQDN")
 def cluster_info(gns_server):
     try:
-        result = json.dumps(gnsapi.get_cluster_info(gns_server), indent=2, separators=(',', ': '), sort_keys=True)
+        gns_state = json.dumps(gnsapi.get_cluster_info(gns_server), indent=2, separators=(',', ': '), sort_keys=True)
     except gnsapi.GNSAPIException:
         raise
     else:
-        click.echo(result)
+        click.echo(gns_state)
+    try:
+        jobs = gnsapi.get_jobs(gns_server)
+    except gnsapi.GNSAPIException:
+        raise
+    else:
+        click.echo(jobs)
 
 
 @gns.command()
