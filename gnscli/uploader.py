@@ -37,7 +37,7 @@ def _execute_git_command(cmd: str, extra: dict, err_msg: str):
         return result.std_out
 
 
-def main(gns_server, path, message):
+def upload(gns_server, path, message):
 
     status = _execute_git_command(cmd='status', extra={'path': path}, err_msg="Can't get git status").split('\n')
 

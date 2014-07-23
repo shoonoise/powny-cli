@@ -48,7 +48,7 @@ def upload(gns_server, rules_path, message):
     """
     LOG.info("Upload updated rules to GNS...")
     try:
-        uploader.main(gns_server, rules_path, message)
+        uploader.upload(gns_server, rules_path, message)
     except uploader.UploadRulesException as error:
         LOG.error("Error occurred while rules upload. %s", error)
 
