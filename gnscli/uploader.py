@@ -48,9 +48,7 @@ def upload(gns_server, path, message):
 
     logger.info("Commit current changes...")
 
-    msg = message
-
-    _execute_git_command(cmd='commit -a -m {}'.format(msg), extra={'path': path},
+    _execute_git_command(cmd='commit -a -m {}'.format(message), extra={'path': path},
                          err_msg="Can't commit your changes")
 
     logger.info("Pull changes from rules server...")
