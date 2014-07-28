@@ -63,6 +63,10 @@ def gns():
 @gns.command()
 @click.option('--gns-server', envvar='GNS_SERVER', required=True, help="GNS FQDN")
 def cluster_info(gns_server):
+    """
+    Show generic cluster info
+    Equivalent to  GET `/system/state`
+    """
     gns_state = gnsapi.get_cluster_info(gns_server)
     click.echo(pprint.pformat(gns_state))
 
@@ -70,6 +74,10 @@ def cluster_info(gns_server):
 @gns.command()
 @click.option('--gns-server', envvar='GNS_SERVER', required=True, help="GNS FQDN")
 def jobs_list(gns_server):
+    """
+    Show current jobs list by id
+    Equivalent to  GET `/jobs/`
+    """
     jobs = gnsapi.get_jobs(gns_server)
     click.echo(pprint.pformat(jobs))
 

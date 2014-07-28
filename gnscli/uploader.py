@@ -40,7 +40,14 @@ def _execute_git_command(cmd: str, extra: dict, err_msg: str):
 
 
 def upload(gns_server, path, message):
-
+    """
+    This function execute git commands:
+        - git commit -a -m "{message}"
+        - git pull --rebase
+        - git push # to origin
+        - git push ssh://git@gns/remote.git # to each GNS git
+    and POST new HEAD hash to GNS via API
+    """
     status = _execute_git_command(cmd='status', extra={'path': path}, err_msg="Can't get git status").split('\n')
 
     if 'nothing to commit, working directory clean' in status[3]:
