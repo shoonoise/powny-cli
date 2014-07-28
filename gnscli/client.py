@@ -54,14 +54,17 @@ def upload(gns_server, rules_path, message):
 
 
 @cli.group()
-def gns():
+@click.option('--gns-server', envvar='GNS_SERVER', required=True, help="GNS FQDN")
+@click.pass_context
+def gns(ctx, gns_server):
     """
     GNS API wrapper
     """
+    ctx.obj = gns_server
 
 
 @gns.command()
-@click.option('--gns-server', envvar='GNS_SERVER', required=True, help="GNS FQDN")
+@click.pass_obj
 def cluster_info(gns_server):
     """
     Show generic cluster info
@@ -72,7 +75,7 @@ def cluster_info(gns_server):
 
 
 @gns.command()
-@click.option('--gns-server', envvar='GNS_SERVER', required=True, help="GNS FQDN")
+@click.pass_obj
 def jobs_list(gns_server):
     """
     Show current jobs list by id
@@ -83,8 +86,8 @@ def jobs_list(gns_server):
 
 
 @gns.command()
-@click.option('--gns-server', envvar='GNS_SERVER', required=True, help="GNS FQDN")
 @click.argument('job_id')
+@click.pass_obj
 def kill_job(gns_server, job_id):
     """
     Terminate job by id.
@@ -99,8 +102,8 @@ def kill_job(gns_server, job_id):
 @click.argument('service', required=False)
 @click.argument('severity', required=False)
 @click.option('--file', '-f', type=click.File('r'), help="Path to JSON file with event description")
-@click.option('--gns-server', envvar='GNS_SERVER', required=True, help="GNS FQDN")
-def send_event(host, service, severity, file, gns_server):
+@click.pass_obj
+def send_event(gns_server, host, service, severity, file):
     """
     Send event to GNS via API.
     Could be called with arguments `host service severity` or with JSON file event description.
