@@ -1,3 +1,4 @@
 import pkg_resources
 
-__version__ = pkg_resources.require("gns-cli")[0].version
+__name__ = "gnscli"
+__version__ = pkg_resources.require(__name__)[0].version

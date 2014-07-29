@@ -147,7 +147,11 @@ def send_event(gns_server, host, service, severity, file):
 
     gnsapi.send_event(gns_server, event)
 
-if __name__ == "__main__":
+
+def main():
+    """
+    Command's entry point
+    """
     try:
         cli()
     except (gnsapi.GNSAPIException, uploader.GitCommandError) as error:
