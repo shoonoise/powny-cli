@@ -36,7 +36,7 @@ $ vim rules/on_event_bar.py
 + Что бы загрузить правила в GNS выполните:
 
 ```bash
-gns-cli --debug rules upload -m "Change rule" --gns-server=http://gns-testing.example.net:7887
+$ gns-cli --debug rules upload -m "Change rule" --gns-server=http://gns-testing.example.net:7887
 ```
 
 > Эта команда пытается синхронизировать ваши изменения с удалённым репозиторием правил, с которым вы работаете.
@@ -189,7 +189,7 @@ $ gns-cli --debug gns --gns-server=http://gns-testing.example.net:7887 send_even
 Так же, событие может быть описано в файле, который задаётся опцией `--file`:
 
 ```bash
-gns-cli --debug gns --gns-server=http://gns-testing.example.net:7887 send_event --file event.json
+$ gns-cli --debug gns --gns-server=http://gns-testing.example.net:7887 send_event --file event.json
 ```
 
 *Output:*
