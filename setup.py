@@ -8,7 +8,7 @@ if __name__ == "__main__":
           description='GNS Command line tool',
           author='Alexander Kushnarev',
           author_email='avkushnarev@gmail.com',
-          url='https://github.com/yandex-sysmon/gns-rules-checker',
+          url='https://github.com/yandex-sysmon/gns-cli',
           packages=['gnscli'],
           package_data={'gnscli': ['config.yaml']},
           entry_points={'console_scripts': ['gns-cli = gnscli.client:main']},
