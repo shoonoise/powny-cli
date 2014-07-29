@@ -6,6 +6,7 @@ import logging
 import pprint
 from gnscli import uploader
 from gnscli import gnsapi
+from gnscli import checker
 from gnscli import settings
 
 
@@ -18,6 +19,15 @@ def _validate_repo_path(_, value):
             "{repo_path} is not git repository!".format(repo_path=value))
     else:
         return value
+
+
+def _validate_event_desc(_, event_file):
+    try:
+        event_desc = json.load(event_file)
+    except (TypeError, ValueError):
+        LOG.error("Can't parse event description file %s", event_file)
+    else:
+        return event_desc
 
 
 @click.group()
@@ -34,23 +44,38 @@ def cli(debug, config):
 
 
 @cli.group()
-def rules():
+@click.option('--rules-path', '-r', type=click.Path(exists=True), envvar='GNS_RULES_PATH',
+              callback=_validate_repo_path, default='.', help="Path to rules dir")
+@click.pass_context
+def rules(ctx, rules_path):
     """
     Manage GNS rules
     """
+    ctx.obj = rules_path
 
 
 @rules.command()
-@click.option('--rules-path', '-r', type=click.Path(exists=True), envvar='GNS_RULES_PATH',
-              callback=_validate_repo_path, default='.', help="Path to rules dir")
 @click.option('--message', '-m', required=True, help="Describe you changes")
 @click.option('--gns-server', envvar='GNS_SERVER', required=True, help="GNS FQDN")
-def upload(gns_server, rules_path, message):
+@click.pass_obj
+def upload(rules_path, gns_server, message):
     """
     Upload new or changed rules in GNS
     """
     LOG.info("Upload updated rules to GNS...")
     uploader.upload(gns_server, rules_path, message)
+
+
+@rules.command()
+@click.option('--event-desc', '-e', required=True, type=click.File('r'),
+              callback=_validate_event_desc, help="JSON file with event description")
+@click.pass_obj
+def execute(rules_path, event_desc):
+    """
+    Run GNS rules locally
+    """
+    config = settings.Settings.config
+    checker.check(config, rules_path, event_desc)
 
 
 @cli.group()

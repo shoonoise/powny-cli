@@ -14,7 +14,7 @@ class GitCommandError(Exception):
     pass
 
 
-def _update_head(gns_server: str, path):
+def _update_head(gns_server: str, path: str):
     new_head = _execute_git_command(cmd="rev-parse HEAD", extra={'path': path}, err_msg="Can't update HEAD").strip()
     current_head = gnsapi.get_header(gns_server)
     if new_head == current_head:
@@ -39,7 +39,7 @@ def _execute_git_command(cmd: str, extra: dict, err_msg: str):
         return out
 
 
-def upload(gns_server, path, message):
+def upload(gns_server: str, path: str, message: str):
     """
     This function execute git commands:
         - git commit -a -m "{message}"

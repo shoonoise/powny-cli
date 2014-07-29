@@ -2,14 +2,13 @@
 
 from setuptools import setup
 
-setup(name='gns-rules-checker',
-      version='0.5',
-      description='Tool to check GNS rules locally',
+setup(name='gns-cli',
+      version='0.6',
+      description='GNS Command line tool',
       author='Alexander Kushnarev',
       author_email='avkushnarev@gmail.com',
       url='https://github.com/yandex-sysmon/gns-rules-checker',
-      packages=['gnsruleschecker', 'gnscli'],
-      package_data={'gnsruleschecker': ['config.yaml'], 'gnscli': ['config.yaml']},
-      entry_points={'console_scripts': ['gns-checker = gnsruleschecker.checkrule:main',
-                                        'gns-cli = gnscli.client.cli']},
+      packages=['gnscli'],
+      package_data={'gnscli': ['config.yaml']},
+      entry_points={'console_scripts': ['gns-cli = gnscli.client.cli']},
       install_requires=['gns', 'raava', 'pyyaml', 'click', 'envoy-beta', 'requests'])

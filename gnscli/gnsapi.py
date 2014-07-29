@@ -37,7 +37,7 @@ def send_event(gns_server: str, event_desc: dict):
         LOG.info("New event posted. Job Id: {}".format(resp.json().get('id')))
 
 
-def terminate_job(gns_server: str, job_id):
+def terminate_job(gns_server: str, job_id: str):
     resp = requests.delete(urljoin(gns_server, '/api/rest/v1/jobs/{}'.format(job_id)))
 
     if resp.status_code == 404:
@@ -51,7 +51,7 @@ def terminate_job(gns_server: str, job_id):
         LOG.info("Job id {} was deleted".format(job_id))
 
 
-def set_header(gns_server: str, head):
+def set_header(gns_server: str, head: str):
     resp = requests.post(urljoin(gns_server, '/api/rest/v1/rules/head'),
                          headers={'content-type': 'application/json'},
                          data=json.dumps({"head": head}))
