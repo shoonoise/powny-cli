@@ -30,6 +30,16 @@ def _validate_event_desc(_, event_file):
         return event_desc
 
 
+def _read_gns_server_from_settings(_, gns_server):
+    if gns_server:
+        return gns_server
+    gns_server = settings.Settings.config.get('gns_api_fqdn')
+    if gns_server:
+        return gns_server
+    else:
+        click.BadParameter("GNS API FQDN does not defined")
+
+
 @click.group()
 @click.option('--debug/--no-debug', default=False)
 @click.option('--config', '-c', type=click.File('r'), callback=settings.Settings.load)
@@ -56,7 +66,8 @@ def rules(ctx, rules_path):
 
 @rules.command()
 @click.option('--message', '-m', required=True, help="Describe you changes")
-@click.option('--gns-server', envvar='GNS_SERVER', required=True, help="GNS FQDN")
+@click.option('--gns-server', envvar='GNS_SERVER', help="GNS FQDN",
+              callback=_read_gns_server_from_settings)
 @click.pass_obj
 def upload(rules_path, gns_server, message):
     """
@@ -79,7 +90,8 @@ def execute(rules_path, event_desc):
 
 
 @cli.group()
-@click.option('--gns-server', envvar='GNS_SERVER', required=True, help="GNS FQDN")
+@click.option('--gns-server', envvar='GNS_SERVER', callback=_read_gns_server_from_settings,
+              help="GNS FQDN")
 @click.pass_context
 def gns(ctx, gns_server):
     """

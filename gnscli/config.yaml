@@ -1,5 +1,7 @@
 gns_git_remotes:
-  - ssh://git@gns-testing.haze.yandex.net:2022/var/lib/gns/rules.git
+  - ssh://git@localhost:2022/var/lib/gns/rules.git
+
+gns_api_fqdn: http://localhost:7887
 
 output:
     email:

@@ -67,6 +67,7 @@ def upload(gns_server: str, path: str, message: str):
     _execute_git_command('push', path, "Can't push your changes")
 
     gns_repos = Settings.config.get("gns_git_remotes")
+    assert gns_repos, "GNS git remotes does not defined. Can't upload rules."
     for repo in gns_repos:
         logger.info("Upload rules to {}...".format(repo))
         _execute_git_command('push {} master'.format(repo), path, err_msg="Can't push to GNS remote")

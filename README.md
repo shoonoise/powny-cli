@@ -187,4 +187,4 @@ INFO:gnscli.gnsapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa8f82
 cat event.json |  gns-cli gns --gns-server=http://gns-testing.example.net:7887 send_event --file -
 ```
 
-Опция `--gns-server` может быть задана в переменной окружения `GNS_SERVER`.
+Опция `--gns-server` может быть задана в переменной окружения `GNS_SERVER` или определён в конфиге (`gns_api_fqdn`).
