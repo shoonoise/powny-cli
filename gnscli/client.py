@@ -63,7 +63,7 @@ def cli(debug, config):
 @click.pass_context
 def rules(ctx, rules_path):
     """
-    Manage GNS rules
+    Manage GNS rules.
     """
     ctx.obj = rules_path
 
@@ -75,7 +75,7 @@ def rules(ctx, rules_path):
 @click.pass_obj
 def upload(rules_path, api_url, message):
     """
-    Upload new or changed rules in GNS
+    Upload new or changed rules in GNS.
     """
     LOG.info("Upload updated rules to GNS...")
     uploader.upload(api_url, rules_path, message)
@@ -87,7 +87,7 @@ def upload(rules_path, api_url, message):
 @click.pass_obj
 def execute(rules_path, event_desc):
     """
-    Run GNS rules locally
+    Run GNS rules locally.
     """
     config = Settings.config
     checker.check(config, rules_path, event_desc)
@@ -95,11 +95,11 @@ def execute(rules_path, event_desc):
 
 @cli.group()
 @click.option('--api-url', envvar='GNS_API_URL', callback=_read_gns_api_url_from_settings,
-              help="GNS API URL")
+              help="GNS API URL", metavar="<url>")
 @click.pass_context
 def gns(ctx, api_url):
     """
-    GNS API wrapper
+    GNS API wrapper.
     """
     ctx.obj = api_url
 
@@ -108,8 +108,7 @@ def gns(ctx, api_url):
 @click.pass_obj
 def cluster_info(api_url):
     """
-    Show generic cluster info
-    Equivalent to  GET `/system/state`
+    Show generic cluster info.
     """
     gns_state = gnsapi.get_cluster_info(api_url)
     click.echo(yaml.dump(gns_state))
@@ -119,8 +118,7 @@ def cluster_info(api_url):
 @click.pass_obj
 def job_list(api_url):
     """
-    Show current jobs list by id
-    Equivalent to  GET `/jobs/`
+    Show current jobs list by id.
     """
     jobs = gnsapi.get_jobs(api_url)
     click.echo(pprint.pformat(jobs))
