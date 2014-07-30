@@ -188,4 +188,4 @@ cat event.json |  gns-cli gns --api-url=http://gns-testing.example.net:7887 send
 ```
 
 Опция `--api-url` может быть задана в переменной окружения `GNS_API_URL` или определёна в конфиге
- (например, `gns_api_url: http://localhost:7887/api/`).
+ (например, `gns_api_url: http://localhost:7887/api`).

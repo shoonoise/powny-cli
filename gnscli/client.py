@@ -3,6 +3,7 @@ import click
 import os
 import sys
 import logging
+import logging.config
 import pprint
 from gnscli import uploader
 from gnscli import gnsapi
@@ -51,6 +52,8 @@ def cli(debug, config):
         logging.basicConfig(level=logging.DEBUG)
     else:
         logging.basicConfig(level=logging.INFO)
+
+    logging.config.dictConfig(settings.Settings.config.get('logging', {}))
 
 
 @cli.group()

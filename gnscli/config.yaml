@@ -1,8 +1,26 @@
 gns_git_remotes:
   - ssh://git@localhost:2022/var/lib/gns/rules.git
 
-gns_api_url: http://localhost:7887/api/
+gns_api_url: http://localhost:7887/api
 
 output:
     email:
       server: localhost
+
+logging:
+    version: 1
+    disable_existing_loggers: false
+    loggers:
+        requests.packages.urllib3.connectionpool:
+            level: WARN
+    formatters:
+        default:
+            (): colorlog.ColoredFormatter
+            style: "{"
+            format: "{yellow}{asctime} {log_color}{levelname:>7} {purple}{name:20.20}{reset} {message}"
+    handlers:
+        default:
+            class: logging.StreamHandler
+            formatter: default
+    root:
+        handlers: [default]
