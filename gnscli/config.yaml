@@ -13,6 +13,8 @@ logging:
     loggers:
         requests.packages.urllib3.connectionpool:
             level: WARN
+        urllib3.connectionpool:
+            level: WARN
     formatters:
         default:
             (): colorlog.ColoredFormatter
