@@ -169,3 +169,6 @@ def main():
     except (gnsapi.GNSAPIException, uploader.GitCommandError) as error:
         LOG.error("Error occurred: %s", error)
         sys.exit(1)
+
+if __name__ == '__main__':
+    main()
