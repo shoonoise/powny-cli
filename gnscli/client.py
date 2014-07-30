@@ -5,6 +5,7 @@ import sys
 import logging
 import logging.config
 import pprint
+import yaml
 from gnscli.settings import Settings
 from gnscli import uploader
 from gnscli import gnsapi
@@ -111,7 +112,7 @@ def cluster_info(api_url):
     Equivalent to  GET `/system/state`
     """
     gns_state = gnsapi.get_cluster_info(api_url)
-    click.echo(pprint.pformat(gns_state))
+    click.echo(yaml.dump(gns_state))
 
 
 @gns.command("job-list")
