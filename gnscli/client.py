@@ -77,7 +77,7 @@ def upload(rules_path, gns_server, message):
     uploader.upload(gns_server, rules_path, message)
 
 
-@rules.command()
+@rules.command("exec")
 @click.option('--event-desc', '-e', required=True, type=click.File('r'),
               callback=_validate_event_desc, help="JSON file with event description")
 @click.pass_obj
@@ -100,7 +100,7 @@ def gns(ctx, gns_server):
     ctx.obj = gns_server
 
 
-@gns.command()
+@gns.command("cluster-info")
 @click.pass_obj
 def cluster_info(gns_server):
     """
@@ -111,9 +111,9 @@ def cluster_info(gns_server):
     click.echo(pprint.pformat(gns_state))
 
 
-@gns.command()
+@gns.command("job-list")
 @click.pass_obj
-def jobs_list(gns_server):
+def job_list(gns_server):
     """
     Show current jobs list by id
     Equivalent to  GET `/jobs/`
@@ -122,7 +122,7 @@ def jobs_list(gns_server):
     click.echo(pprint.pformat(jobs))
 
 
-@gns.command()
+@gns.command("kill-job")
 @click.argument('job_id')
 @click.pass_obj
 def kill_job(gns_server, job_id):
@@ -134,7 +134,7 @@ def kill_job(gns_server, job_id):
     gnsapi.terminate_job(gns_server, job_id)
 
 
-@gns.command()
+@gns.command("send-event")
 @click.argument('host', required=False)
 @click.argument('service', required=False)
 @click.argument('severity', required=False)

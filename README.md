@@ -71,7 +71,7 @@ $ cat event.json
 Что бы выполнить правило запустите:
 
 ```bash
-$ gns-cli --debug rules -r gns-load-test-rules execute -e event.json
+$ gns-cli --debug rules -r gns-load-test-rules exec -e event.json
 ```
 
 *Output:*
@@ -105,7 +105,7 @@ INFO:gnshelpers.output.via_email:Email sent to: ['alexanderk@example-team.ru']; 
 ### Получить информацию о GNS кластере
 
 ```bash
-$ gns-cli gns --gns-server=http://gns-testing.example.net:7887 cluster_info
+$ gns-cli gns --gns-server=http://gns-testing.example.net:7887 cluster-info
 ```
 
 *Output:*
@@ -139,13 +139,13 @@ INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): 
 ### Получить список активных заданий
 
 ```bash
-$ gns-cli gns --gns-server=http://gns-testing.example.net:7887 jobs_list
+$ gns-cli gns --gns-server=http://gns-testing.example.net:7887 job-list
 ```
 
 ### Остановить задачу по UUID
 
 ```bash
-$ gns-cli gns --gns-server=http://gns-testing.example.net:7887 kill_job _JOB_UUID_
+$ gns-cli gns --gns-server=http://gns-testing.example.net:7887 kill-job _JOB_UUID_
 ```
 
 
@@ -154,13 +154,13 @@ $ gns-cli gns --gns-server=http://gns-testing.example.net:7887 kill_job _JOB_UUI
 Если событие простое (состоит из полей `host`, `service`, `severity`), то описание может быть переданно как аргументы:
 
 ```bash
-$ gns-cli gns --gns-server=http://gns-testing.example.net:7887 send_event http://example.com golem CRIT
+$ gns-cli gns --gns-server=http://gns-testing.example.net:7887 send-event http://example.com golem CRIT
 ```
 
 Так же, событие может быть описано в файле, который задаётся опцией `--file`:
 
 ```bash
-$ gns-cli gns --gns-server=http://gns-testing.example.net:7887 send_event --file event.json
+$ gns-cli gns --gns-server=http://gns-testing.example.net:7887 send-event --file event.json
 ```
 
 *Output:*
@@ -184,7 +184,7 @@ INFO:gnscli.gnsapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa8f82
 Например:
 
 ```bash
-cat event.json |  gns-cli gns --gns-server=http://gns-testing.example.net:7887 send_event --file -
+cat event.json |  gns-cli gns --gns-server=http://gns-testing.example.net:7887 send-event --file -
 ```
 
-Опция `--gns-server` может быть задана в переменной окружения `GNS_SERVER` или определён в конфиге (`gns_api_fqdn`).
+Опция `--gns-server` может быть задана в переменной окружения `GNS_SERVER` или определёна в конфиге (`gns_api_fqdn`).
