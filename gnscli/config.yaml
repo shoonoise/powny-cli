@@ -1,7 +1,7 @@
 gns_git_remotes:
   - ssh://git@localhost:2022/var/lib/gns/rules.git
 
-gns_api_fqdn: http://localhost:7887
+gns_api_url: http://localhost:7887/api/
 
 output:
     email:

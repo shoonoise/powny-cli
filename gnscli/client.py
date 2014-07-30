@@ -30,14 +30,14 @@ def _validate_event_desc(_, event_file):
         return event_desc
 
 
-def _read_gns_server_from_settings(_, gns_server):
-    if gns_server:
-        return gns_server
-    gns_server = settings.Settings.config.get('gns_api_fqdn')
-    if gns_server:
-        return gns_server
+def _read_gns_api_url_from_settings(_, api_url):
+    if api_url:
+        return api_url
+    api_url = settings.Settings.config.get('gns_api_url')
+    if api_url:
+        return api_url
     else:
-        click.BadParameter("GNS API FQDN does not defined")
+        click.BadParameter("GNS API url does not defined")
 
 
 @click.group()
@@ -66,15 +66,15 @@ def rules(ctx, rules_path):
 
 @rules.command()
 @click.option('--message', '-m', required=True, help="Describe you changes")
-@click.option('--gns-server', envvar='GNS_SERVER', help="GNS FQDN",
-              callback=_read_gns_server_from_settings)
+@click.option('--api-url', envvar='GNS_API_URL', help="GNS API URL",
+              callback=_read_gns_api_url_from_settings)
 @click.pass_obj
-def upload(rules_path, gns_server, message):
+def upload(rules_path, api_url, message):
     """
     Upload new or changed rules in GNS
     """
     LOG.info("Upload updated rules to GNS...")
-    uploader.upload(gns_server, rules_path, message)
+    uploader.upload(api_url, rules_path, message)
 
 
 @rules.command("exec")
@@ -90,48 +90,48 @@ def execute(rules_path, event_desc):
 
 
 @cli.group()
-@click.option('--gns-server', envvar='GNS_SERVER', callback=_read_gns_server_from_settings,
-              help="GNS FQDN")
+@click.option('--api-url', envvar='GNS_API_URL', callback=_read_gns_api_url_from_settings,
+              help="GNS API URL")
 @click.pass_context
-def gns(ctx, gns_server):
+def gns(ctx, api_url):
     """
     GNS API wrapper
     """
-    ctx.obj = gns_server
+    ctx.obj = api_url
 
 
 @gns.command("cluster-info")
 @click.pass_obj
-def cluster_info(gns_server):
+def cluster_info(api_url):
     """
     Show generic cluster info
     Equivalent to  GET `/system/state`
     """
-    gns_state = gnsapi.get_cluster_info(gns_server)
+    gns_state = gnsapi.get_cluster_info(api_url)
     click.echo(pprint.pformat(gns_state))
 
 
 @gns.command("job-list")
 @click.pass_obj
-def job_list(gns_server):
+def job_list(api_url):
     """
     Show current jobs list by id
     Equivalent to  GET `/jobs/`
     """
-    jobs = gnsapi.get_jobs(gns_server)
+    jobs = gnsapi.get_jobs(api_url)
     click.echo(pprint.pformat(jobs))
 
 
 @gns.command("kill-job")
 @click.argument('job_id')
 @click.pass_obj
-def kill_job(gns_server, job_id):
+def kill_job(api_url, job_id):
     """
     Terminate job by id.
     Now, by GNS API limitation, job just marked as `should be deleted`,
     physically it could be deleted for several time or never.
     """
-    gnsapi.terminate_job(gns_server, job_id)
+    gnsapi.terminate_job(api_url, job_id)
 
 
 @gns.command("send-event")
@@ -140,7 +140,7 @@ def kill_job(gns_server, job_id):
 @click.argument('severity', required=False)
 @click.option('--file', '-f', type=click.File('r'), help="Path to JSON file with event description")
 @click.pass_obj
-def send_event(gns_server, host, service, severity, file):
+def send_event(api_url, host, service, severity, file):
     """
     Send event to GNS via API.
     Could be called with arguments `host service severity` or with JSON file event description.
@@ -157,7 +157,7 @@ def send_event(gns_server, host, service, severity, file):
 
     LOG.info("Send event: {}".format(pprint.pformat(event)))
 
-    gnsapi.send_event(gns_server, event)
+    gnsapi.send_event(api_url, event)
 
 
 def main():

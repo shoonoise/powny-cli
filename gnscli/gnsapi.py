@@ -4,7 +4,6 @@ This module is wrapper to GNS REST API.
 
 import json
 import requests
-from requests.compat import urljoin
 import logging
 
 
@@ -16,7 +15,7 @@ class GNSAPIException(Exception):
 
 
 def get_cluster_info(gns_server: str):
-    resp = requests.get(urljoin(gns_server, '/api/rest/v1/system/state'))
+    resp = requests.get(gns_server + '/rest/v1/system/state')
     try:
         resp.raise_for_status()
     except requests.HTTPError:
@@ -26,7 +25,7 @@ def get_cluster_info(gns_server: str):
 
 
 def send_event(gns_server: str, event_desc: dict):
-    resp = requests.post(urljoin(gns_server, '/api/rest/v1/jobs'),
+    resp = requests.post(gns_server + '/rest/v1/jobs',
                          headers={'content-type': 'application/json'},
                          data=json.dumps(event_desc))
     try:
@@ -38,7 +37,7 @@ def send_event(gns_server: str, event_desc: dict):
 
 
 def terminate_job(gns_server: str, job_id: str):
-    resp = requests.delete(urljoin(gns_server, '/api/rest/v1/jobs/{}'.format(job_id)))
+    resp = requests.delete(gns_server + '/rest/v1/jobs/{}'.format(job_id))
 
     if resp.status_code == 404:
         LOG.info("Job id `{}` is not found. Probably it is already deleted or was not created".format(job_id))
@@ -52,7 +51,7 @@ def terminate_job(gns_server: str, job_id: str):
 
 
 def set_header(gns_server: str, head: str):
-    resp = requests.post(urljoin(gns_server, '/api/rest/v1/rules/head'),
+    resp = requests.post(gns_server + '/rest/v1/rules/head',
                          headers={'content-type': 'application/json'},
                          data=json.dumps({"head": head}))
     try:
@@ -64,7 +63,7 @@ def set_header(gns_server: str, head: str):
 
 
 def get_header(gns_server: str):
-    resp = requests.get(urljoin(gns_server, '/api/rest/v1/rules/head'))
+    resp = requests.get(gns_server + '/rest/v1/rules/head')
     try:
         resp.raise_for_status()
     except requests.HTTPError:
@@ -74,7 +73,7 @@ def get_header(gns_server: str):
 
 
 def get_jobs(gns_server: str):
-    resp = requests.get(urljoin(gns_server, '/api/rest/v1/jobs'))
+    resp = requests.get(gns_server + '/rest/v1/jobs')
     try:
         resp.raise_for_status()
     except requests.HTTPError:
