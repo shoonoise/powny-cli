@@ -2,7 +2,7 @@
 
 from setuptools import setup
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     setup(name='gnscli',
           version='0.6.1',
           description='GNS Command line tool',

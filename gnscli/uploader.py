@@ -70,7 +70,7 @@ def upload(gns_server: str, path: str, message: str):
     assert gns_repos, "GNS git remotes does not defined. Can't upload rules."
     for repo in gns_repos:
         logger.info("Upload rules to {}...".format(repo))
-        _execute_git_command('push {} master'.format(repo), path, err_msg="Can't push to GNS remote")
+        _execute_git_command('push {} master'.format(repo), path, "Can't push to GNS remote")
 
     _update_head(gns_server, path)
 
