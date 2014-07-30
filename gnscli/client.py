@@ -5,10 +5,10 @@ import sys
 import logging
 import logging.config
 import pprint
+from gnscli.settings import Settings
 from gnscli import uploader
 from gnscli import gnsapi
 from gnscli import checker
-from gnscli import settings
 
 
 LOG = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ def _validate_event_desc(_, event_file):
 def _read_gns_api_url_from_settings(_, api_url):
     if api_url:
         return api_url
-    api_url = settings.Settings.config.get('gns_api_url')
+    api_url = Settings.get('gns_api_url')
     if api_url:
         return api_url
     else:
@@ -43,7 +43,7 @@ def _read_gns_api_url_from_settings(_, api_url):
 
 @click.group()
 @click.option('--debug/--no-debug', default=False)
-@click.option('--config', '-c', type=click.File('r'), callback=settings.Settings.load)
+@click.option('--config', '-c', type=click.File('r'), callback=Settings.load)
 def cli(debug, config):
     """
     GNS command line tool.
@@ -53,7 +53,7 @@ def cli(debug, config):
     else:
         logging.basicConfig(level=logging.INFO)
 
-    logging.config.dictConfig(settings.Settings.config.get('logging', {}))
+    logging.config.dictConfig(Settings.get('logging', {}))
 
 
 @cli.group()
@@ -88,7 +88,7 @@ def execute(rules_path, event_desc):
     """
     Run GNS rules locally
     """
-    config = settings.Settings.config
+    config = Settings.config
     checker.check(config, rules_path, event_desc)
 
 
