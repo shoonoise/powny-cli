@@ -12,4 +12,4 @@ if __name__ == '__main__':
           packages=['gnscli'],
           package_data={'gnscli': ['config.yaml']},
           entry_points={'console_scripts': ['gns-cli = gnscli.client:main']},
-          install_requires=['gns', 'raava', 'pyyaml', 'click', 'envoy-beta', 'requests'])
+          install_requires=['gns', 'raava', 'pyyaml', 'click', 'envoy-beta', 'requests', 'colorlog'])
