@@ -1,0 +1,20 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Content-Length: ['0']
+      User-Agent: [python-requests/2.3.0 CPython/3.4.0 Darwin/13.3.0]
+    method: DELETE
+    uri: http://localhost:7887/api/rest/v1/jobs/87311816-d0ad-4668-b1cd-6e095d9d01da
+  response:
+    body: {string: '{"status": "ok"}'}
+    headers:
+      Allow: ['DELETE, GET, HEAD, POST']
+      Content-Length: ['16']
+      Content-Type: [application/json]
+      Date: ['Wed, 30 Jul 2014 16:39:16 GMT']
+      Server: [CherryPy/3.5.0]
+    status: {code: 200, message: OK}
+version: 1

@@ -1,0 +1,20 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      User-Agent: [python-requests/2.3.0 CPython/3.4.0 Darwin/13.3.0]
+    method: GET
+    uri: http://localhost:7887/api/rest/v1/jobs
+  response:
+    body: {string: '["87311816-d0ad-4668-b1cd-6e095d9d01da", "6e78c72e-dd61-46ad-a6f3-0f6e45fc7114",
+        "69c6501b-28f4-4857-8430-f3f63f9e211b", "f3959ab2-e143-43f7-9291-5a54f893acd1"]'}
+    headers:
+      Allow: ['DELETE, GET, HEAD, POST']
+      Content-Length: ['160']
+      Content-Type: [application/json]
+      Date: ['Wed, 30 Jul 2014 16:34:23 GMT']
+      Server: [CherryPy/3.5.0]
+    status: {code: 200, message: OK}
+version: 1
