@@ -1,0 +1,21 @@
+interactions:
+- request:
+    body: '{"head": "2238e6636063b57b541c0f1799596e1617dec489"}'
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Content-Length: ['52']
+      User-Agent: [python-requests/2.3.0 CPython/3.4.0 Darwin/13.3.0]
+      content-type: [application/json]
+    method: POST
+    uri: http://gns-testing.haze.yandex.net:7887/api/rest/v1/rules/head
+  response:
+    body: {string: '{"head": "2238e6636063b57b541c0f1799596e1617dec489"}'}
+    headers:
+      Allow: ['GET, HEAD, POST']
+      Content-Length: ['52']
+      Content-Type: [application/json]
+      Date: ['Thu, 31 Jul 2014 10:14:17 GMT']
+      Server: [CherryPy/3.5.0]
+    status: {code: 200, message: OK}
+version: 1

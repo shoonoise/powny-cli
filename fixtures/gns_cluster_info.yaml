@@ -1,0 +1,30 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      User-Agent: [python-requests/2.3.0 CPython/3.4.0 Darwin/13.3.0]
+    method: GET
+    uri: http://localhost:7887/api/rest/v1/system/state
+  response:
+    body: {string: '{"worker": {"d6f2b259-433b-4d60-b205-33b9867a2f65@gns-worker-localship":
+        {"host": {"node": "gns-worker-localship", "fqdn": "gns-worker-localship"},
+        "threads": {"workers_limit": 1, "respawns": 1, "die_after": null}, "when":
+        "2014-07-30T15:21:45Z"}}, "splitter": {"0f8ee3be-9148-49fd-bb20-ea3e65b0a590@gns-splitter-localship":
+        {"host": {"node": "gns-splitter-localship", "fqdn": "gns-splitter-localship"},
+        "threads": {"workers_limit": 1, "respawns": 1, "die_after": null}, "when":
+        "2014-07-30T15:21:45Z", "loader": {"last_commit": "2238e6636063b57b541c0f1799596e1617dec489",
+        "last_head": "git_2238e6636063b57b541c0f1799596e1617dec489", "rules_dir":
+        "/var/lib/gns/rules"}}}, "collector": {"96365003-b273-46a5-b4c6-8ee984a91c2a@gns-collector-localship":
+        {"host": {"node": "gns-collector-localship", "fqdn": "gns-collector-localship"},
+        "threads": {"workers_limit": 1, "respawns": 1, "die_after": null}, "when":
+        "2014-07-30T15:21:45Z"}}}'}
+    headers:
+      Allow: ['GET, HEAD']
+      Content-Length: ['931']
+      Content-Type: [application/json]
+      Date: ['Wed, 30 Jul 2014 15:21:49 GMT']
+      Server: [CherryPy/3.5.0]
+    status: {code: 200, message: OK}
+version: 1
