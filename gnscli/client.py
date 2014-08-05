@@ -6,6 +6,7 @@ import logging
 import logging.config
 import pprint
 import yaml
+import webbrowser
 from gnscli.settings import Settings
 from gnscli import uploader
 from gnscli import gnsapi
@@ -160,6 +161,23 @@ def send_event(api_url, host, service, severity, file):
     LOG.info("Send event: {}".format(pprint.pformat(event)))
 
     gnsapi.send_event(api_url, event)
+
+
+@cli.command("browse-logs")
+@click.option('--browser', '-b', help="Target browser")
+def open_log_page(browser):
+    """
+    Open kibana logs dashboard immediately in browser.
+    """
+    url = Settings.get("kibana_dashboard_url")
+
+    try:
+        if browser:
+            webbrowser.get(using=browser).open_new_tab(url)
+        else:
+            webbrowser.open_new_tab(url)
+    except Exception as error:
+        LOG.error("Can't open %s in %s browser. Error occurred: %s", url, browser or "default", error)
 
 
 def main():
