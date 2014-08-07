@@ -1,8 +1,8 @@
 import unittest
 import vcr
 from click.testing import CliRunner
-from gnscli import client
-from gnscli import gnsapi
+from pownycli import client
+from pownycli import gnsapi
 
 
 test_vcr = vcr.VCR(cassette_library_dir="fixtures")

@@ -1,4 +1,4 @@
-GNS Cli
+Powny Cli
 =================
 
 GNS command line tools облегчает взаимодействие с GNS API, а так же позволяет проверять работу правил локально.
@@ -7,7 +7,7 @@ GNS command line tools облегчает взаимодействие с GNS AP
 -------
 В общем случае, должно быть достаточно выполнить:
 
-`pip install gnscli`
+`pip install powny-cli`
 
 > Утилита протестированна *только* с python >= 3.3
 
@@ -15,7 +15,7 @@ GNS command line tools облегчает взаимодействие с GNS AP
 
 *Утилита тянет с собой не мало зависимостей (в основном, для локального выполнения правил), будьте к этому готовы*
 
-Что умеет gns-cli
+Что умеет powny-cli
 -------
 
 ### Загрузить новые или изменённые правила в GNS
@@ -36,7 +36,7 @@ $ vim rules/on_event_bar.py
 + Что бы загрузить правила в GNS выполните:
 
 ```bash
-$ gns-cli rules upload -m "Change rule" --api-url=http://gns-testing.example.net:7887
+$ powny-cli rules upload -m "Change rule" --api-url=http://gns-testing.example.net:7887
 ```
 
 > Эта команда пытается синхронизировать ваши изменения с удалённым репозиторием правил, с которым вы работаете.
@@ -45,15 +45,15 @@ $ gns-cli rules upload -m "Change rule" --api-url=http://gns-testing.example.net
 *Output:*
 
 ```
-INFO:gnscli.client:Upload updated rules to GNS...
-INFO:gnscli.uploader:Commit current changes...
-INFO:gnscli.uploader:Pull changes from rules server...
-INFO:gnscli.uploader:Sync you changes with rules server...
-INFO:gnscli.uploader:Upload rules to ssh://git@gns-testing.example.net:2022/var/lib/gns/rules.git...
+INFO:pownycli.client:Upload updated rules to GNS...
+INFO:pownycli.uploader:Commit current changes...
+INFO:pownycli.uploader:Pull changes from rules server...
+INFO:pownycli.uploader:Sync you changes with rules server...
+INFO:pownycli.uploader:Upload rules to ssh://git@gns-testing.example.net:2022/var/lib/gns/rules.git...
 INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): gns-testing.example.net
 INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): gns-testing.example.net
-INFO:gnscli.gnsapi:Set new head: 2238e6636063b57b541c0f1799596e1617dec489
-INFO:gnscli.uploader:You rules uploaded to GNS!
+INFO:pownycli.gnsapi:Set new head: 2238e6636063b57b541c0f1799596e1617dec489
+INFO:pownycli.uploader:You rules uploaded to GNS!
 ```
 
 
@@ -71,21 +71,21 @@ $ cat event.json
 Что бы выполнить правило запустите:
 
 ```bash
-$ gns-cli --debug rules -r gns-load-test-rules exec -e event.json
+$ powny-cli --debug rules -r gns-load-test-rules exec -e event.json
 ```
 
 *Output:*
 
 ```bash
-DEBUG:raava.handlers:Loading rules from head: ; root: /home/cloud-user/gns-cli-test/gns-load-test-rules
+DEBUG:raava.handlers:Loading rules from head: ; root: /home/cloud-user/powny-cli-test/gns-load-test-rules
 DEBUG:raava.handlers:Scanning for rules: rules/on_event_bar.py
-DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_bar' from '/home/cloud-user/gns-cli-test/gns-load-test-rules/rules/on_event_bar.py'>
+DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_bar' from '/home/cloud-user/powny-cli-test/gns-load-test-rules/rules/on_event_bar.py'>
 DEBUG:raava.handlers:Scanning for rules: rules/on_event_foo_3.py
-DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_foo_3' from '/home/cloud-user/gns-cli-test/gns-load-test-rules/rules/on_event_foo_3.py'>
+DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_foo_3' from '/home/cloud-user/powny-cli-test/gns-load-test-rules/rules/on_event_foo_3.py'>
 DEBUG:raava.handlers:Scanning for rules: rules/on_event_foo_2.py
-DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_foo_2' from '/home/cloud-user/gns-cli-test/gns-load-test-rules/rules/on_event_foo_2.py'>
+DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_foo_2' from '/home/cloud-user/powny-cli-test/gns-load-test-rules/rules/on_event_foo_2.py'>
 DEBUG:raava.handlers:Scanning for rules: rules/on_event_foo.py
-DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_foo' from '/home/cloud-user/gns-cli-test/gns-load-test-rules/rules/on_event_foo.py'>
+DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_foo' from '/home/cloud-user/powny-cli-test/gns-load-test-rules/rules/on_event_foo.py'>
 DEBUG:raava.rules:Applied: 0a8e1c3c-b573-4688-9a67-d9f35d56496e --> rules.on_event_foo_3.on_event
 DEBUG:raava.rules:Applied: 0a8e1c3c-b573-4688-9a67-d9f35d56496e --> rules.on_event_foo_2.on_event
 DEBUG:raava.rules:Applied: 0a8e1c3c-b573-4688-9a67-d9f35d56496e --> rules.on_event_foo.on_event
@@ -100,12 +100,12 @@ DEBUG:gnshelpers.output.via_email:Sending email to: ['alexanderk@example-team.ru
 INFO:gnshelpers.output.via_email:Email sent to: ['alexanderk@example-team.ru']; cc: []
 ```
 
-Если `gns-cli` настроен верно, то вы получите все необходимые уведомления.
+Если `powny-cli` настроен верно, то вы получите все необходимые уведомления.
  
 ### Получить информацию о GNS кластере
 
 ```bash
-$ gns-cli gns --api-url=http://gns-testing.example.net:7887 cluster-info
+$ powny-cli gns --api-url=http://gns-testing.example.net:7887 cluster-info
 ```
 
 *Output:*
@@ -139,13 +139,13 @@ INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): 
 ### Получить список активных заданий
 
 ```bash
-$ gns-cli gns --api-url=http://gns-testing.example.net:7887 job-list
+$ powny-cli gns --api-url=http://gns-testing.example.net:7887 job-list
 ```
 
 ### Остановить задачу по UUID
 
 ```bash
-$ gns-cli gns --api-url=http://gns-testing.example.net:7887 kill-job _JOB_UUID_
+$ powny-cli gns --api-url=http://gns-testing.example.net:7887 kill-job _JOB_UUID_
 ```
 
 
@@ -154,28 +154,28 @@ $ gns-cli gns --api-url=http://gns-testing.example.net:7887 kill-job _JOB_UUID_
 Если событие простое (состоит из полей `host`, `service`, `severity`), то описание может быть переданно как аргументы:
 
 ```bash
-$ gns-cli gns --api-url=http://gns-testing.example.net:7887 send-event http://example.com golem CRIT
+$ powny-cli gns --api-url=http://gns-testing.example.net:7887 send-event http://example.com golem CRIT
 ```
 
 Так же, событие может быть описано в файле, который задаётся опцией `--file`:
 
 ```bash
-$ gns-cli gns --api-url=http://gns-testing.example.net:7887 send-event --file event.json
+$ powny-cli gns --api-url=http://gns-testing.example.net:7887 send-event --file event.json
 ```
 
 *Output:*
 
 ```
-INFO:gnscli.client:Send event: {'host': 'http://example.com', 'service': 'golem', 'severity': 'CRIT'}
+INFO:pownycli.client:Send event: {'host': 'http://example.com', 'service': 'golem', 'severity': 'CRIT'}
 INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): gns-testing.example.net
-INFO:gnscli.gnsapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa8f82d
+INFO:pownycli.gnsapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa8f82d
 ```
 
 О настройке и опциях
 ---------
 При установке с пакетом поставляется конфиг по умолчанию.
-Что бы внести изменения в конфигурацию, необходимые опции можно переписать в файле `~/.config/gnscli/config.yaml`,
-или передать опцию `gns-cli --config=my_config.yaml`.
+Что бы внести изменения в конфигурацию, необходимые опции можно переписать в файле `~/.config/powny-cli/config.yaml`,
+или передать опцию `powny-cli --config=my_config.yaml`.
 
 Можно использовать опцию `--debug` для более подробного вывода. По умолчанию, уровень `INFO`.
 
@@ -184,7 +184,7 @@ INFO:gnscli.gnsapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa8f82
 Например:
 
 ```bash
-cat event.json |  gns-cli gns --api-url=http://gns-testing.example.net:7887 send-event --file -
+cat event.json |  powny-cli gns --api-url=http://gns-testing.example.net:7887 send-event --file -
 ```
 
 Опция `--api-url` может быть задана в переменной окружения `GNS_API_URL` или определёна в конфиге

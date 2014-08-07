@@ -20,7 +20,7 @@ class Settings:
             cls.config = yaml.load(file)
         else:
             config = yaml.load(resource_stream(__name__, 'config.yaml'))
-            path_to_user_config = os.path.expanduser('~/.config/gnscli/config.yaml')
+            path_to_user_config = os.path.expanduser('~/.config/powny-cli/config.yaml')
             if os.path.exists(path_to_user_config):
                 config.update(yaml.load(open(path_to_user_config)))
             cls.config = config

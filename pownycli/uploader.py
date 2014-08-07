@@ -3,9 +3,9 @@ This module is for upload updated or new rules to GNS.
 """
 
 import envoy
-from gnscli import gnsapi
 import logging
-from gnscli.settings import Settings
+from pownycli import gnsapi
+from pownycli.settings import Settings
 
 logger = logging.getLogger(__name__)
 

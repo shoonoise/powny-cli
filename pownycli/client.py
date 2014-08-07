@@ -7,10 +7,10 @@ import logging.config
 import pprint
 import yaml
 import webbrowser
-from gnscli.settings import Settings
-from gnscli import uploader
-from gnscli import gnsapi
-from gnscli import checker
+from pownycli.settings import Settings
+from pownycli import uploader
+from pownycli import gnsapi
+from pownycli import checker
 
 
 LOG = logging.getLogger(__name__)
@@ -186,7 +186,7 @@ def main():
     """
     try:
         cli()
-    except (gnsapi.GNSAPIException, uploader.GitCommandError) as error:
+    except Exception as error:
         LOG.error("Error occurred: %s", error)
         sys.exit(1)
 
