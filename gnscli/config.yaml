@@ -3,6 +3,8 @@ gns_git_remotes:
 
 gns_api_url: http://localhost:7887/api
 
+kibana_dashboard_url: https://localhost/index.html#/dashboard/elasticsearch/GNS
+
 output:
     email:
       server: localhost
