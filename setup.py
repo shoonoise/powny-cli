@@ -25,15 +25,15 @@ class PyTest(TestCommand):
 
 
 if __name__ == '__main__':
-    setup(name='gnscli',
+    setup(name='powny-cli',
           version='0.6.1',
           description='GNS Command line tool',
           author='Alexander Kushnarev',
           author_email='avkushnarev@gmail.com',
-          url='https://github.com/yandex-sysmon/gns-cli',
-          packages=['gnscli'],
-          package_data={'gnscli': ['config.yaml']},
-          entry_points={'console_scripts': ['gns-cli = gnscli.client:main']},
+          url='https://github.com/yandex-sysmon/powny-cli',
+          packages=['pownycli'],
+          package_data={'pownycli': ['config.yaml']},
+          entry_points={'console_scripts': ['powny-cli = pownycli.client:main']},
           install_requires=['gns', 'raava', 'pyyaml', 'click', 'envoy-beta', 'requests', 'colorlog'],
           tests_require=['vcrpy', 'pytest-cov'],
           cmdclass={'test': PyTest})
