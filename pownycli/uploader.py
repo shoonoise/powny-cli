@@ -68,7 +68,9 @@ def upload(gns_server: str, path: str, message: str, force: bool):
         logger.info("There is no changes.")
     else:
         logger.info("Commit current changes...")
-
+        if not message:
+            logger.info("`--message` option was not specified")
+            message = input("Enter commit message: ")
         _execute_git_command('commit -a -m "{}"'.format(message), path,
                              "Can't commit your changes")
 
@@ -78,20 +80,14 @@ def upload(gns_server: str, path: str, message: str, force: bool):
 
     logger.info("Sync you changes with rules server...")
 
-    if force:
-        cmd = 'push --force'
-    else:
-        cmd = 'push'
+    cmd = 'push --force' if force else 'push'
     _execute_git_command(cmd, path, "Can't push your changes")
 
     gns_repos = Settings.get("gns_git_remotes")
     assert gns_repos, "GNS git remotes does not defined. Can't upload rules."
     for repo in gns_repos:
         logger.info("Upload rules to {}...".format(repo))
-        if force:
-            cmd = 'push --force {} master'
-        else:
-            cmd = 'push {} master'
+        cmd = 'push --force {} master' if force else 'push {} master'
         _execute_git_command(cmd.format(repo), path, "Can't push to GNS remote")
 
     logger.debug("Update head...")

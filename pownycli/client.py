@@ -70,7 +70,7 @@ def rules(ctx, rules_path):
 
 
 @rules.command()
-@click.option('--message', '-m', required=True, help="Describe you changes")
+@click.option('--message', '-m', help="Describe you changes")
 @click.option('--force/--no-force', '-f', help="Force to upload rules")
 @click.option('--api-url', envvar='GNS_API_URL', help="GNS API URL",
               callback=_read_gns_api_url_from_settings)
