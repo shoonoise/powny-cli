@@ -158,7 +158,7 @@ def send_event(api_url, host, service, severity, file):
         LOG.error("You mast pass `host service severity` args or --file option")
         sys.exit(1)
 
-    LOG.info("Send event: {}".format(pprint.pformat(event)))
+    LOG.info("Send event: {}".format(event))
 
     gnsapi.send_event(api_url, event)
 

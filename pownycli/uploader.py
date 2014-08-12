@@ -14,6 +14,12 @@ class GitCommandError(Exception):
     pass
 
 
+def _multiline_log(level: int, prefix: str, out_lines: str):
+    for line in out_lines.split('\n'):
+        if len(line):
+            logger.log(level, prefix, line)
+
+
 def _update_head(gns_server: str, path: str):
     new_head = _execute_git_command("rev-parse HEAD", path, err_msg="Can't update HEAD").strip()
     current_head = gnsapi.get_header(gns_server)
@@ -29,11 +35,16 @@ def _execute_git_command(cmd: str, path, err_msg: str):
     logger.debug("Execute command: %s", full_cmd)
     result = envoy.run(full_cmd)
     out, err, exit_code = result.std_out, result.std_err, result.status_code
-    logger.debug("Git stdout: %s", out)
+    _multiline_log(logging.DEBUG, "Git stdout: %s", out)
     if exit_code > git_warn_exit_code:
-        raise GitCommandError(err_msg, err, out, full_cmd)
+        _multiline_log(logging.ERROR, "Git stderr: %s", err)
+        raise GitCommandError(err_msg)
     elif exit_code == git_warn_exit_code:
-        logger.warning("Git stderr: %s", err)
+        if err:
+            _multiline_log(logging.DEBUG, "Git stderr: %s", err)
+            raise GitCommandError(err_msg)
+        elif out:
+            _multiline_log(logging.DEBUG, "Git stdout: %s", out)
         return out
     else:
         return out
@@ -52,11 +63,11 @@ def upload(gns_server: str, path: str, message: str):
 
     if 'nothing to commit, working directory clean' in status[3]:
         logger.info("There is no changes.")
+    else:
+        logger.info("Commit current changes...")
 
-    logger.info("Commit current changes...")
-
-    _execute_git_command('commit -a -m "{}"'.format(message), path,
-                         "Can't commit your changes")
+        _execute_git_command('commit -a -m "{}"'.format(message), path,
+                             "Can't commit your changes")
 
     logger.info("Pull changes from rules server...")
 
