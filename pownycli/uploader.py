@@ -22,10 +22,13 @@ def _multiline_log(level: int, prefix: str, out_lines: str):
 
 def _update_head(gns_server: str, path: str):
     new_head = _execute_git_command("rev-parse HEAD", path, err_msg="Can't update HEAD").strip()
+    logger.debug("Local HEAD is %s", new_head)
     current_head = gnsapi.get_header(gns_server)
+    logger.debug("Remote HEAD is %s", current_head)
     if new_head == current_head:
         logger.info("HEAD already updated")
         return
+    logger.debug("Update HEAD to %s", new_head)
     gnsapi.set_header(gns_server, new_head)
 
 
@@ -41,7 +44,7 @@ def _execute_git_command(cmd: str, path, err_msg: str):
         raise GitCommandError(err_msg)
     elif exit_code == git_warn_exit_code:
         if err:
-            _multiline_log(logging.DEBUG, "Git stderr: %s", err)
+            _multiline_log(logging.ERROR, "Git stderr: %s", err)
             raise GitCommandError(err_msg)
         elif out:
             _multiline_log(logging.DEBUG, "Git stdout: %s", out)
@@ -50,7 +53,7 @@ def _execute_git_command(cmd: str, path, err_msg: str):
         return out
 
 
-def upload(gns_server: str, path: str, message: str):
+def upload(gns_server: str, path: str, message: str, force: bool):
     """
     This function execute git commands:
         - git commit -a -m "{message}"
@@ -75,14 +78,23 @@ def upload(gns_server: str, path: str, message: str):
 
     logger.info("Sync you changes with rules server...")
 
-    _execute_git_command('push', path, "Can't push your changes")
+    if force:
+        cmd = 'push --force'
+    else:
+        cmd = 'push'
+    _execute_git_command(cmd, path, "Can't push your changes")
 
     gns_repos = Settings.get("gns_git_remotes")
     assert gns_repos, "GNS git remotes does not defined. Can't upload rules."
     for repo in gns_repos:
         logger.info("Upload rules to {}...".format(repo))
-        _execute_git_command('push {} master'.format(repo), path, "Can't push to GNS remote")
+        if force:
+            cmd = 'push --force {} master'
+        else:
+            cmd = 'push {} master'
+        _execute_git_command(cmd.format(repo), path, "Can't push to GNS remote")
 
+    logger.debug("Update head...")
     _update_head(gns_server, path)
 
     logger.info("You rules uploaded to GNS!")
