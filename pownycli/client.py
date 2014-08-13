@@ -44,7 +44,7 @@ def _read_gns_api_url_from_settings(_, api_url):
 
 
 @click.group()
-@click.option('--debug/--no-debug', default=False)
+@click.option('--debug/--no-debug', '-d', help="Enable debug logs")
 @click.option('--config', '-c', type=click.File('r'), callback=Settings.load)
 def cli(debug, config):
     """
@@ -70,16 +70,17 @@ def rules(ctx, rules_path):
 
 
 @rules.command()
-@click.option('--message', '-m', required=True, help="Describe you changes")
+@click.option('--message', '-m', help="Describe you changes")
+@click.option('--force/--no-force', '-f', help="Force to upload rules")
 @click.option('--api-url', envvar='GNS_API_URL', help="GNS API URL",
               callback=_read_gns_api_url_from_settings)
 @click.pass_obj
-def upload(rules_path, api_url, message):
+def upload(rules_path, api_url, message, force):
     """
     Upload new or changed rules in GNS.
     """
     LOG.info("Upload updated rules to GNS...")
-    uploader.upload(api_url, rules_path, message)
+    uploader.upload(api_url, rules_path, message, force)
 
 
 @rules.command("exec")
