@@ -1,6 +1,6 @@
 import os
-from pkg_resources import resource_stream
 import yaml
+from pkg_resources import resource_stream
 
 
 class Settings:

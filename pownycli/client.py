@@ -7,10 +7,12 @@ import logging.config
 import pprint
 import yaml
 import webbrowser
+import shutil
 from pownycli.settings import Settings
 from pownycli import uploader
 from pownycli import gnsapi
 from pownycli import checker
+from pkg_resources import resource_stream
 
 
 LOG = logging.getLogger(__name__)
@@ -56,6 +58,46 @@ def cli(debug, config):
         logging.basicConfig(level=logging.INFO)
 
     logging.config.dictConfig(Settings.get('logging', {}))
+
+
+@cli.command("create-config")
+@click.option('--force/--no-force', '-f', help="Rewrite existing config")
+def gen_config(force):
+    """
+    Generate default user's config.
+    """
+    config_dir = '~/.config/powny-cli/'
+    full_conf_dir = os.path.expanduser(config_dir)
+    if not os.path.exists(full_conf_dir):
+        os.mkdir(full_conf_dir)
+    full_config_path = os.path.join(full_conf_dir, 'config.yaml')
+    if os.path.exists(full_config_path):
+        if force:
+            logging.warning("Config %s, already created. Will be rewrote.", full_config_path)
+        else:
+            raise RuntimeError("Config %s, already exist. Nothing generated.", full_config_path)
+
+    with resource_stream(__name__, 'config.yaml') as source:
+        with open(full_config_path, 'wb') as target:
+            shutil.copyfileobj(source, target)
+    logging.info("%s file created", full_config_path)
+
+
+@cli.command("browse-logs")
+@click.option('--browser', '-b', help="Target browser")
+def open_log_page(browser):
+    """
+    Open kibana logs dashboard in browser.
+    """
+    url = Settings.get("kibana_dashboard_url")
+
+    try:
+        if browser:
+            webbrowser.get(using=browser).open_new_tab(url)
+        else:
+            webbrowser.open_new_tab(url)
+    except Exception as error:
+        LOG.error("Can't open %s in %s browser. Error occurred: %s", url, browser or "default", error)
 
 
 @cli.group()
@@ -162,23 +204,6 @@ def send_event(api_url, host, service, severity, file):
     LOG.info("Send event: {}".format(event))
 
     gnsapi.send_event(api_url, event)
-
-
-@cli.command("browse-logs")
-@click.option('--browser', '-b', help="Target browser")
-def open_log_page(browser):
-    """
-    Open kibana logs dashboard immediately in browser.
-    """
-    url = Settings.get("kibana_dashboard_url")
-
-    try:
-        if browser:
-            webbrowser.get(using=browser).open_new_tab(url)
-        else:
-            webbrowser.open_new_tab(url)
-    except Exception as error:
-        LOG.error("Can't open %s in %s browser. Error occurred: %s", url, browser or "default", error)
 
 
 def main():
