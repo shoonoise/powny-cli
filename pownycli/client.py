@@ -17,7 +17,7 @@ from pkg_resources import resource_stream
 from requests.compat import urljoin
 
 
-LOG = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def _validate_repo_path(_, value):
@@ -32,7 +32,7 @@ def _validate_event_desc(_, event_file):
     try:
         event_desc = json.load(event_file)
     except (TypeError, ValueError):
-        LOG.error("Can't parse event description file %s", event_file)
+        logger.error("Can't parse event description file %s", event_file)
     else:
         return event_desc
 
@@ -100,7 +100,7 @@ def open_log_page(browser):
         else:
             webbrowser.open_new_tab(url)
     except Exception as error:
-        LOG.error("Can't open %s in %s browser. Error occurred: %s", url, browser or "default", error)
+        logger.error("Can't open %s in %s browser. Error occurred: %s", url, browser or "default", error)
 
 
 @cli.command("job-logs")
@@ -120,7 +120,7 @@ def job_logs(job_id, size):
         level = fields["level"]
         node = fields["node"]
 
-        if LOG.getEffectiveLevel() != logging.DEBUG and level == ['DEBUG']:
+        if logger.getEffectiveLevel() != logging.DEBUG and level == ['DEBUG']:
             continue
 
         msg = "{node}: {time} {level} {msg}".format(node=node, time=time, msg=msg, level=level)
@@ -129,7 +129,7 @@ def job_logs(job_id, size):
                 # To catch cases when `msg = '%s (parents: %s)'`, but `args = ['Spawned the new job']`
                 click.echo(msg % tuple(args))
             except TypeError as error:
-                LOG.warning("Can't format string. %s. So next record is a raw.", error)
+                logger.warning("Can't format string. %s. So next record is a raw.", error)
                 click.echo(msg+str(args))
         else:
             click.echo(msg)
@@ -156,8 +156,19 @@ def upload(rules_path, api_url, message, force):
     """
     Upload new or changed rules in Powny.
     """
-    LOG.info("Upload updated rules to Powny...")
+    logger.info("Upload updated rules to Powny...")
     uploader.upload(api_url, rules_path, message, force)
+
+
+@rules.command()
+@click.argument('file_name', required=True)
+@click.pass_obj
+def add(rules_path, file_name):
+    """
+    Add new file as a rule.
+    """
+    logger.info("Upload updated rules to Powny...")
+    uploader.add(rules_path, file_name)
 
 
 @rules.command("exec")
@@ -233,10 +244,10 @@ def send_event(api_url, host, service, severity, file):
     elif host and service and severity:
         event = {'host': host, 'service': service, 'severity': severity}
     else:
-        LOG.error("You mast pass `host service severity` args or --file option")
+        logger.error("You mast pass `host service severity` args or --file option")
         sys.exit(1)
 
-    LOG.info("Send event: {}".format(event))
+    logger.info("Send event: {}".format(event))
 
     pownyapi.send_event(api_url, event)
 
@@ -248,8 +259,8 @@ def main():
     try:
         cli()
     except Exception as error:
-        LOG.error("Error occurred: %s", error)
-        if LOG.getEffectiveLevel() == 'DEBUG':
+        logger.error("Error occurred: %s", error)
+        if logger.getEffectiveLevel() == logging.DEBUG:
             raise
         sys.exit(1)
 

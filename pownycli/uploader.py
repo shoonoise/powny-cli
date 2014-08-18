@@ -53,6 +53,11 @@ def _execute_git_command(cmd: str, path, err_msg: str):
         return out
 
 
+def add(path: str, file_name: str):
+    _execute_git_command('add {name}'.format(name=file_name), path, "Can't add file %s" % file_name)
+    logger.info("New rule %s added" % file_name)
+
+
 def upload(powny_server: str, path: str, message: str, force: bool):
     """
     This function execute git commands:
@@ -66,6 +71,8 @@ def upload(powny_server: str, path: str, message: str, force: bool):
 
     if 'nothing to commit, working directory clean' in status[3]:
         logger.info("There is no changes.")
+    elif 'nothing added to commit but untracked files present' in status[-2]:
+        logger.info("There is no changes, but new files present. Use `rules add` command to add new rule")
     else:
         logger.info("Commit current changes...")
         if not message:

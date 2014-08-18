@@ -7,7 +7,7 @@ import requests
 import logging
 
 
-LOG = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class PownyAPIException(Exception):
@@ -33,21 +33,21 @@ def send_event(powny_server: str, event_desc: dict):
     except requests.HTTPError:
         raise PownyAPIException("Can't post new event.", resp.text)
     else:
-        LOG.info("New event posted. Job Id: {}".format(resp.json().get('id')))
+        logger.info("New event posted. Job Id: {}".format(resp.json().get('id')))
 
 
 def terminate_job(powny_server: str, job_id: str):
     resp = requests.delete(powny_server + '/rest/v1/jobs/{}'.format(job_id))
 
     if resp.status_code == 404:
-        LOG.info("Job id `{}` is not found. Probably it is already deleted or was not created".format(job_id))
+        logger.info("Job id `{}` is not found. Probably it is already deleted or was not created".format(job_id))
         return
     try:
         resp.raise_for_status()
     except requests.HTTPError:
         raise PownyAPIException("Can't delete job id {}".format(job_id), resp.text)
     else:
-        LOG.info("Job id {} was deleted".format(job_id))
+        logger.info("Job id {} was deleted".format(job_id))
 
 
 def set_header(powny_server: str, head: str):
@@ -59,7 +59,7 @@ def set_header(powny_server: str, head: str):
     except requests.HTTPError:
         raise PownyAPIException("Can't upload new HEAD.", resp.text)
     else:
-        LOG.info("Set new head: {}".format(head))
+        logger.info("Set new head: {}".format(head))
 
 
 def get_header(powny_server: str):
