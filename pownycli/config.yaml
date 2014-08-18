@@ -5,6 +5,8 @@ gns_api_url: http://localhost:7887/api
 
 kibana_dashboard_url: https://localhost/index.html#/dashboard/elasticsearch/GNS
 
+elastic_url: http://localhost:9201
+
 output:
     email:
       server: localhost

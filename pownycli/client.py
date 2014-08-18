@@ -5,6 +5,7 @@ import sys
 import logging
 import logging.config
 import pprint
+import requests
 import yaml
 import webbrowser
 import shutil
@@ -13,6 +14,7 @@ from pownycli import uploader
 from pownycli import gnsapi
 from pownycli import checker
 from pkg_resources import resource_stream
+from requests.compat import urljoin
 
 
 LOG = logging.getLogger(__name__)
@@ -98,6 +100,38 @@ def open_log_page(browser):
             webbrowser.open_new_tab(url)
     except Exception as error:
         LOG.error("Can't open %s in %s browser. Error occurred: %s", url, browser or "default", error)
+
+
+@cli.command("job-logs")
+@click.option('--size', '-s', type=int, default=50, help="Amount of records")
+@click.argument('job_id', required=True)
+def job_logs(job_id, size):
+    elastic_url = Settings.get("elastic_url")
+    resp = requests.get(urljoin(elastic_url, '/_all/_search'),
+                        params={'q': 'job_id:%s' % job_id, 'fields': '@timestamp,msg,args,node,level', 'size': size})
+    hits = resp.json()['hits']['hits']
+    hits.sort(key=lambda x: x["fields"]["@timestamp"])
+    for hit in hits:
+        fields = hit["fields"]
+        msg = fields["msg"][0]
+        args = fields.get("args")
+        time = fields["@timestamp"]
+        level = fields["level"]
+        node = fields["node"]
+
+        if LOG.getEffectiveLevel() != logging.DEBUG and level == ['DEBUG']:
+            continue
+
+        msg = "{node}: {time} {level} {msg}".format(node=node, time=time, msg=msg, level=level)
+        if args:
+            try:
+                # To catch cases when `msg = '%s (parents: %s)'`, but `args = ['Spawned the new job']`
+                click.echo(msg % tuple(args))
+            except TypeError as error:
+                LOG.warning("Can't format string. %s. So next record is a raw.", error)
+                click.echo(msg+str(args))
+        else:
+            click.echo(msg)
 
 
 @cli.group()
