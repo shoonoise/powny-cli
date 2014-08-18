@@ -2,13 +2,12 @@ import unittest
 import vcr
 from click.testing import CliRunner
 from pownycli import client
-from pownycli import gnsapi
 
 
 test_vcr = vcr.VCR(cassette_library_dir="fixtures")
 
 
-class TestGNSCommand(unittest.TestCase):
+class TestPownyCommand(unittest.TestCase):
     def setUp(self):
         self.runner = CliRunner()
         self.api_url = "http://localhost:7887/api"
@@ -43,20 +42,3 @@ class TestGNSCommand(unittest.TestCase):
             self.assertEqual(cass.requests[0].uri,
                              self.api_url + "/rest/v1/jobs")
             self.assertEqual(result.exit_code, 0)
-
-
-class TestGNSAPI(unittest.TestCase):
-
-    def setUp(self):
-        self.api_url = "http://gns-testing.haze.yandex.net:7887/api"
-
-    def test_get_header(self):
-        with test_vcr.use_cassette("gns_get_head.yaml") as cass:
-            gnsapi.get_header(self.api_url)
-            self.assertEqual(cass.requests[0].uri, self.api_url + "/rest/v1/rules/head")
-
-    def test_set_head(self):
-        with test_vcr.use_cassette("gns_set_head.yaml") as cass:
-            gnsapi.set_header("http://gns-testing.haze.yandex.net:7887/api",
-                              "2238e6636063b57b541c0f1799596e1617dec489")
-            self.assertEqual(cass.requests[0].uri, self.api_url + "/rest/v1/rules/head")

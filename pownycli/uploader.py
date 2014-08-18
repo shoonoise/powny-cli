@@ -1,10 +1,10 @@
 """
-This module is for upload updated or new rules to GNS.
+This module is for upload updated or new rules to Powny.
 """
 
 import envoy
 import logging
-from pownycli import gnsapi
+from pownycli import pownyapi
 from pownycli.settings import Settings
 
 logger = logging.getLogger(__name__)
@@ -20,16 +20,16 @@ def _multiline_log(level: int, prefix: str, out_lines: str):
             logger.log(level, prefix, line)
 
 
-def _update_head(gns_server: str, path: str):
+def _update_head(powny_server: str, path: str):
     new_head = _execute_git_command("rev-parse HEAD", path, err_msg="Can't update HEAD").strip()
     logger.debug("Local HEAD is %s", new_head)
-    current_head = gnsapi.get_header(gns_server)
+    current_head = pownyapi.get_header(powny_server)
     logger.debug("Remote HEAD is %s", current_head)
     if new_head == current_head:
         logger.info("HEAD already updated")
         return
     logger.debug("Update HEAD to %s", new_head)
-    gnsapi.set_header(gns_server, new_head)
+    pownyapi.set_header(powny_server, new_head)
 
 
 def _execute_git_command(cmd: str, path, err_msg: str):
@@ -53,14 +53,14 @@ def _execute_git_command(cmd: str, path, err_msg: str):
         return out
 
 
-def upload(gns_server: str, path: str, message: str, force: bool):
+def upload(powny_server: str, path: str, message: str, force: bool):
     """
     This function execute git commands:
         - git commit -a -m "{message}"
         - git pull --rebase
         - git push # to origin
-        - git push ssh://git@gns/remote.git # to each GNS git
-    and POST new HEAD hash to GNS via API
+        - git push ssh://git@powny/remote.git # to each Powny git
+    and POST new HEAD hash to Powny via API
     """
     status = _execute_git_command('status', path, "Can't get git status").split('\n')
 
@@ -83,14 +83,14 @@ def upload(gns_server: str, path: str, message: str, force: bool):
     cmd = 'push --force' if force else 'push'
     _execute_git_command(cmd, path, "Can't push your changes")
 
-    gns_repos = Settings.get("gns_git_remotes")
-    assert gns_repos, "GNS git remotes does not defined. Can't upload rules."
-    for repo in gns_repos:
+    powny_repos = Settings.get("powny_git_remotes")
+    assert powny_repos, "Powny git remotes does not defined. Can't upload rules."
+    for repo in powny_repos:
         logger.info("Upload rules to {}...".format(repo))
         cmd = 'push --force {} master' if force else 'push {} master'
-        _execute_git_command(cmd.format(repo), path, "Can't push to GNS remote")
+        _execute_git_command(cmd.format(repo), path, "Can't push to Powny remote")
 
     logger.debug("Update head...")
-    _update_head(gns_server, path)
+    _update_head(powny_server, path)
 
-    logger.info("You rules uploaded to GNS!")
+    logger.info("You rules uploaded to Powny!")

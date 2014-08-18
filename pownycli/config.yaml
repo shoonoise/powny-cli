@@ -1,9 +1,9 @@
-gns_git_remotes:
-  - ssh://git@localhost:2022/var/lib/gns/rules.git
+powny_git_remotes:
+  - ssh://git@localhost:2022/var/lib/powny/rules.git
 
-gns_api_url: http://localhost:7887/api
+powny_api_url: http://localhost:7887/api
 
-kibana_dashboard_url: https://localhost/index.html#/dashboard/elasticsearch/GNS
+kibana_dashboard_url: https://localhost/index.html#/dashboard/elasticsearch/powny
 
 elastic_url: http://localhost:9201
 
