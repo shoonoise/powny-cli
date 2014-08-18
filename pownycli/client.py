@@ -248,6 +248,8 @@ def main():
         cli()
     except Exception as error:
         LOG.error("Error occurred: %s", error)
+        if LOG.getEffectiveLevel() == 'DEBUG':
+            raise
         sys.exit(1)
 
 if __name__ == '__main__':
