@@ -77,8 +77,8 @@ def gen_config(force):
         if force:
             logging.warning("Config %s, already created. Will be rewrote.", full_config_path)
         else:
-            raise RuntimeError("Config %s, already exist. Nothing generated. Use `--force` to rewrite it."
-                               % full_config_path)
+            raise RuntimeError(
+                "Config {}, already exist. Nothing generated. Use `--force` to rewrite it.".format(full_config_path))
 
     with resource_stream(__name__, 'config.yaml') as source:
         with open(full_config_path, 'wb') as target:
@@ -107,20 +107,20 @@ def open_log_page(browser):
 @click.option('--size', '-s', type=int, default=50, help="Amount of records")
 @click.argument('job_id', required=True)
 def job_logs(job_id, size):
-    elastic_url = Settings.get("elastic_url")
+    elastic_url = Settings.get('elastic_url')
     resp = requests.get(urljoin(elastic_url, '/_all/_search'),
-                        params={'q': 'job_id:%s' % job_id, 'fields': '@timestamp,msg,args,node,level', 'size': size})
+                        params={'q': 'job_id:%s' % job_id, 'size': size})
     hits = resp.json()['hits']['hits']
-    hits.sort(key=lambda x: x["fields"]["@timestamp"])
+    hits.sort(key=lambda x: x["_source"]["@timestamp"])
     for hit in hits:
-        fields = hit["fields"]
-        msg = fields["msg"][0]
+        fields = hit["_source"]
+        msg = fields["msg"]
         args = fields.get("args")
         time = fields["@timestamp"]
         level = fields["level"]
         node = fields["node"]
 
-        if logger.getEffectiveLevel() != logging.DEBUG and level == ['DEBUG']:
+        if logger.getEffectiveLevel() != logging.DEBUG and level == 'DEBUG':
             continue
 
         msg = "{node}: {time} {level} {msg}".format(node=node, time=time, msg=msg, level=level)

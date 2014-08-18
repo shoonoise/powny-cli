@@ -55,7 +55,7 @@ def _execute_git_command(cmd: str, path, err_msg: str):
 
 def add(path: str, file_name: str):
     _execute_git_command('add {name}'.format(name=file_name), path, "Can't add file %s" % file_name)
-    logger.info("New rule %s added" % file_name)
+    logger.info("New rule %s added", file_name)
 
 
 def upload(powny_server: str, path: str, message: str, force: bool):

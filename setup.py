@@ -26,7 +26,7 @@ class PyTest(TestCommand):
 
 if __name__ == '__main__':
     setup(name='powny-cli',
-          version='0.6.1',
+          version='0.7',
           description='GNS Command line tool',
           author='Alexander Kushnarev',
           author_email='avkushnarev@gmail.com',

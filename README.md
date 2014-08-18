@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/shoonoise/powny-cli.svg?branch=rename)](https://travis-ci.org/shoonoise/powny-cli)
+[![Latest Version](https://pypip.in/v/powny-cli/badge.png)](https://pypi.python.org/pypi/powny-cli/)
+
 Powny Cli
 =================
 
@@ -33,14 +36,14 @@ $ cd powny-test-rules
 $ vim rules/on_event_bar.py
 ```
 
-+ Что бы загрузить правила в Powny выполните:
++ Чтобы загрузить правила в Powny, выполните:
 
 ```bash
 $ powny-cli rules upload -m "Change rule" --api-url=http://powny-testing.example.net:7887
 ```
 
 > Эта команда пытается синхронизировать ваши изменения с удалённым репозиторием правил, с которым вы работаете.
-> А после загружает правила в powny.
+> А после - загружает правила в powny.
 
 *Output:*
 
@@ -59,7 +62,7 @@ INFO:pownycli.uploader:You rules uploaded to Powny!
 
 ### Выполнить правило локально
 
-Пусть, репозиторий с правилами на ходится в директории `./powny-rules` и описание события в  `event.json`.
+Пусть, репозиторий с правилами находится в директории `./powny-rules` и описание события в  `event.json`.
 
 > Убедитесь, что `event.json` в правильном формате, например:
 
@@ -68,7 +71,7 @@ $ cat event.json
 {"host":"foo", "service":"100", "status":"CRIT", "description":"test"}
 ````
 
-Что бы выполнить правило запустите:
+Чтобы выполнить правило запустите:
 
 ```bash
 $ powny-cli --debug rules -r powny-rules exec -e event.json
@@ -102,7 +105,7 @@ INFO:pownyhelpers.output.via_email:Email sent to: ['alexanderk@example-team.ru']
 
 Если `powny-cli` настроен верно, то вы получите все необходимые уведомления.
  
-### Получить информацию о Powny кластере
+### Получить информацию о Powny-кластере
 
 ```bash
 $ powny-cli powny --api-url=http://powny-testing.example.net:7887 cluster-info
@@ -149,7 +152,7 @@ $ powny-cli powny --api-url=http://powny-testing.example.net:7887 kill-job _JOB_
 ```
 
 
-### Послать событие в powny
+### Послать событие в Powny
 
 Если событие простое (состоит из полей `host`, `service`, `severity`), то описание может быть переданно как аргументы:
 
@@ -174,7 +177,7 @@ INFO:pownycli.pownyapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa
 О настройке и опциях
 ---------
 При установке с пакетом поставляется конфиг по умолчанию.
-Что бы внести изменения в конфигурацию, необходимые опции можно переписать в файле `~/.config/powny-cli/config.yaml`,
+Чтобы внести изменения в конфигурацию, необходимые опции можно переписать в файле `~/.config/powny-cli/config.yaml`,
 или передать опцию `powny-cli --config=my_config.yaml`.
 
 Можно использовать опцию `--debug` для более подробного вывода. По умолчанию, уровень `INFO`.
@@ -187,5 +190,5 @@ INFO:pownycli.pownyapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa
 cat event.json |  powny-cli powny --api-url=http://powny-testing.example.net:7887 send-event --file -
 ```
 
-Опция `--api-url` может быть задана в переменной окружения `powny_API_URL` или определёна в конфиге
+Опция `--api-url` может быть задана в переменной окружения `POWNY_API_URL` или определёна в конфиге
  (например, `powny_api_url: http://localhost:7887/api`).
