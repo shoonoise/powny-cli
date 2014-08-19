@@ -41,7 +41,7 @@ def _validate_event_desc(ctx, param, event_file):
         return event_desc
 
 
-def _read_powny_api_url_from_settings(_, api_url):
+def _read_powny_api_url_from_settings(ctx, param, api_url):
     if api_url:
         return api_url
     api_url = Settings.get('powny_api_url')
