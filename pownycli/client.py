@@ -20,15 +20,17 @@ from requests.compat import urljoin
 logger = logging.getLogger(__name__)
 
 
-def _validate_repo_path(_, value):
-    if '.git' not in os.listdir(value):
+def _validate_repo_path(ctx, param, value):
+    listing = os.listdir(value)
+    if ('.git' not in listing) or ('.pownyrules' not in listing):
         raise click.BadParameter(
-            "{repo_path} is not git repository!".format(repo_path=value))
+            "{repo_path} is not git repository or file `.pownyrules` not exist!"
+            " Make sure that the path is a Powny rules repository.".format(repo_path=value))
     else:
         return value
 
 
-def _validate_event_desc(_, event_file):
+def _validate_event_desc(ctx, param, event_file):
     if event_file is None:
         return None
     try:
