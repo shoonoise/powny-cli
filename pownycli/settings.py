@@ -28,5 +28,10 @@ class Settings:
             path_to_user_config = os.path.expanduser('~/.config/powny-cli/config.yaml')
             if os.path.exists(path_to_user_config):
                 logger.debug("Rewrite default values by %s", path_to_user_config)
-                config.update(yaml.load(open(path_to_user_config)))
+                try:
+                    user_conf = yaml.load(open(path_to_user_config))
+                except (TypeError, ValueError) as error:
+                    logger.warning("Can't load user config. %s", error)
+                else:
+                    config.update(user_conf)
             cls.config = config
