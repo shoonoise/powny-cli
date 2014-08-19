@@ -26,7 +26,7 @@ class PyTest(TestCommand):
 
 if __name__ == '__main__':
     setup(name='powny-cli',
-          version='0.8.0',
+          version='0.8.1',
           description='Powny command line tool',
           author='Alexander Kushnarev',
           author_email='avkushnarev@gmail.com',

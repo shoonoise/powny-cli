@@ -21,9 +21,11 @@ logger = logging.getLogger(__name__)
 
 
 def _validate_repo_path(ctx, param, value):
-    if '.git' not in os.listdir(value):
+    listing = os.listdir(value)
+    if ('.git' not in listing) or ('.pownyrules' not in listing):
         raise click.BadParameter(
-            "{repo_path} is not git repository!".format(repo_path=value))
+            "{repo_path} is not git repository or file `.pownyrules` not exist!"
+            " Make sure that the path is a Powny rules repository.".format(repo_path=value))
     else:
         return value
 
