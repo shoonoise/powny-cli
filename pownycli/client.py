@@ -20,7 +20,7 @@ from requests.compat import urljoin
 logger = logging.getLogger(__name__)
 
 
-def _validate_repo_path(_, value):
+def _validate_repo_path(ctx, param, value):
     if '.git' not in os.listdir(value):
         raise click.BadParameter(
             "{repo_path} is not git repository!".format(repo_path=value))
@@ -28,7 +28,7 @@ def _validate_repo_path(_, value):
         return value
 
 
-def _validate_event_desc(_, event_file):
+def _validate_event_desc(ctx, param, event_file):
     if event_file is None:
         return None
     try:
