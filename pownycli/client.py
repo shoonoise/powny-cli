@@ -29,6 +29,8 @@ def _validate_repo_path(_, value):
 
 
 def _validate_event_desc(_, event_file):
+    if event_file is None:
+        return None
     try:
         event_desc = json.load(event_file)
     except (TypeError, ValueError):
@@ -45,6 +47,13 @@ def _read_powny_api_url_from_settings(_, api_url):
         return api_url
     else:
         click.BadParameter("Powny API url does not defined")
+
+
+def _get_event_from_args(event_args):
+    if event_args and len(event_args) == 3:
+        return {'host': event_args[0], 'service': event_args[1], 'severity': event_args[2]}
+    else:
+        raise click.BadParameter("You mast pass `host service severity` args or `--file` option")
 
 
 @click.group()
@@ -172,15 +181,18 @@ def add(rules_path, file_name):
 
 
 @rules.command("exec")
+@click.argument('event_args', nargs=-1, required=False)
 @click.option('--event-desc', '-e', required=True, type=click.File('r'),
               callback=_validate_event_desc, help="JSON file with event description")
 @click.pass_obj
-def execute(rules_path, event_desc):
+def execute(rules_path, event_desc, event_args):
     """
     Run Powny rules locally.
     """
+    event = event_desc or _get_event_from_args(event_args)
+
     config = Settings.config
-    checker.check(config, rules_path, event_desc)
+    checker.check(config, rules_path, event)
 
 
 @cli.group()
@@ -227,28 +239,19 @@ def kill_job(api_url, job_id):
 
 
 @powny.command("send-event")
-@click.argument('host', required=False)
-@click.argument('service', required=False)
-@click.argument('severity', required=False)
-@click.option('--file', '-f', type=click.File('r'), help="Path to JSON file with event description")
+@click.argument('event_args', nargs=-1, required=False)
+@click.option('--file', '-f', callback=_validate_event_desc, type=click.File('r'),
+              help="Path to JSON file with event description")
 @click.pass_obj
-def send_event(api_url, host, service, severity, file):
+def send_event(api_url, event_args, file):
     """
     Send event to Powny via API.
     Could be called with arguments `host service severity` or with JSON file event description.
     """
 
-    if file:
-        with file:
-            event = json.load(file)
-    elif host and service and severity:
-        event = {'host': host, 'service': service, 'severity': severity}
-    else:
-        logger.error("You mast pass `host service severity` args or --file option")
-        sys.exit(1)
+    event = file or _get_event_from_args(event_args)
 
     logger.info("Send event: {}".format(event))
-
     pownyapi.send_event(api_url, event)
 
 
