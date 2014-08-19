@@ -9,7 +9,7 @@ from raava.handlers import Loader
 from gns.env import setup_config
 
 
-class GNSCheckerException(Exception):
+class PownyCheckerException(Exception):
     pass
 
 
@@ -43,14 +43,14 @@ def _import_module(path_to_module: str):
     loader = Loader(abspath_to_module, [checked_fn_name])
     functions_to_check = loader.get_handlers('').get(checked_fn_name)
     if not functions_to_check:
-        raise GNSCheckerException("Can't find function {name}".format(name=checked_fn_name))
+        raise PownyCheckerException("Can't find function {name}".format(name=checked_fn_name))
     else:
         return functions_to_check
 
 
 def _get_event_root(event_desc: dict):
     """
-    Return event object, which GNS expected
+    Return event object, which Powny expected
     """
     event = EventRoot()
     event.set_extra({'handler': 'on_event',
@@ -63,7 +63,7 @@ def _get_event_root(event_desc: dict):
 
 def check(config: dict, rule_path: str, event_desc: dict):
     """
-    Search for functions in GNS, which mapped for this event
+    Search for functions in Powny, which mapped for this event
     and execute it
     """
     setup_config(config)
@@ -76,4 +76,4 @@ def check(config: dict, rule_path: str, event_desc: dict):
         try:
             task(event_root)
         except Exception as error:
-            raise GNSCheckerException("Can't execute rule {}, by reason: {}".format(task, error))
+            raise PownyCheckerException("Can't execute rule {}, by reason: {}".format(task, error))

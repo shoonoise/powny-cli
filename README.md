@@ -1,7 +1,10 @@
+[![Build Status](https://travis-ci.org/shoonoise/powny-cli.svg?branch=rename)](https://travis-ci.org/shoonoise/powny-cli)
+[![Latest Version](https://pypip.in/v/powny-cli/badge.png)](https://pypi.python.org/pypi/powny-cli/)
+
 Powny Cli
 =================
 
-GNS command line tools облегчает взаимодействие с GNS API, а так же позволяет проверять работу правил локально.
+Powny command line tools облегчает взаимодействие с Powny API, а так же позволяет проверять работу правил локально.
 
 Установка
 -------
@@ -18,13 +21,13 @@ GNS command line tools облегчает взаимодействие с GNS AP
 Что умеет powny-cli
 -------
 
-### Загрузить новые или изменённые правила в GNS
+### Загрузить новые или изменённые правила в Powny
 
 + Склонируйте репозиторий с правилами:
 
 ```bash
-$ git clone git@github.example-team.ru:alexanderk/gns-load-test-rules.git
-$ cd gns-test-rules
+$ git clone git@github.example-team.ru:alexanderk/powny-load-test-rules.git
+$ cd powny-test-rules
 ```
 
 + Внесите необходимые изменения:
@@ -33,33 +36,33 @@ $ cd gns-test-rules
 $ vim rules/on_event_bar.py
 ```
 
-+ Что бы загрузить правила в GNS выполните:
++ Чтобы загрузить правила в Powny, выполните:
 
 ```bash
-$ powny-cli rules upload -m "Change rule" --api-url=http://gns-testing.example.net:7887
+$ powny-cli rules upload -m "Change rule" --api-url=http://powny-testing.example.net:7887
 ```
 
 > Эта команда пытается синхронизировать ваши изменения с удалённым репозиторием правил, с которым вы работаете.
-> А после загружает правила в GNS.
+> А после - загружает правила в powny.
 
 *Output:*
 
 ```
-INFO:pownycli.client:Upload updated rules to GNS...
+INFO:pownycli.client:Upload updated rules to Powny...
 INFO:pownycli.uploader:Commit current changes...
 INFO:pownycli.uploader:Pull changes from rules server...
 INFO:pownycli.uploader:Sync you changes with rules server...
-INFO:pownycli.uploader:Upload rules to ssh://git@gns-testing.example.net:2022/var/lib/gns/rules.git...
-INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): gns-testing.example.net
-INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): gns-testing.example.net
-INFO:pownycli.gnsapi:Set new head: 2238e6636063b57b541c0f1799596e1617dec489
-INFO:pownycli.uploader:You rules uploaded to GNS!
+INFO:pownycli.uploader:Upload rules to ssh://git@powny-testing.example.net:2022/var/lib/powny/rules.git...
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): powny-testing.example.net
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): powny-testing.example.net
+INFO:pownycli.pownyapi:Set new head: 2238e6636063b57b541c0f1799596e1617dec489
+INFO:pownycli.uploader:You rules uploaded to Powny!
 ```
 
 
 ### Выполнить правило локально
 
-Пусть, репозиторий с правилами на ходится в директории `./gns-rules` и описание события в  `event.json`.
+Пусть, репозиторий с правилами находится в директории `./powny-rules` и описание события в  `event.json`.
 
 > Убедитесь, что `event.json` в правильном формате, например:
 
@@ -68,24 +71,24 @@ $ cat event.json
 {"host":"foo", "service":"100", "status":"CRIT", "description":"test"}
 ````
 
-Что бы выполнить правило запустите:
+Чтобы выполнить правило запустите:
 
 ```bash
-$ powny-cli --debug rules -r gns-load-test-rules exec -e event.json
+$ powny-cli --debug rules -r powny-rules exec -e event.json
 ```
 
 *Output:*
 
 ```bash
-DEBUG:raava.handlers:Loading rules from head: ; root: /home/cloud-user/powny-cli-test/gns-load-test-rules
+DEBUG:raava.handlers:Loading rules from head: ; root: /home/cloud-user/powny-cli-test/powny-rules
 DEBUG:raava.handlers:Scanning for rules: rules/on_event_bar.py
-DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_bar' from '/home/cloud-user/powny-cli-test/gns-load-test-rules/rules/on_event_bar.py'>
+DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_bar' from '/home/cloud-user/powny-cli-test/powny-rules/rules/on_event_bar.py'>
 DEBUG:raava.handlers:Scanning for rules: rules/on_event_foo_3.py
-DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_foo_3' from '/home/cloud-user/powny-cli-test/gns-load-test-rules/rules/on_event_foo_3.py'>
+DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_foo_3' from '/home/cloud-user/powny-cli-test/powny-rules/rules/on_event_foo_3.py'>
 DEBUG:raava.handlers:Scanning for rules: rules/on_event_foo_2.py
-DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_foo_2' from '/home/cloud-user/powny-cli-test/gns-load-test-rules/rules/on_event_foo_2.py'>
+DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_foo_2' from '/home/cloud-user/powny-cli-test/powny-rules/rules/on_event_foo_2.py'>
 DEBUG:raava.handlers:Scanning for rules: rules/on_event_foo.py
-DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_foo' from '/home/cloud-user/powny-cli-test/gns-load-test-rules/rules/on_event_foo.py'>
+DEBUG:raava.handlers:Loaded on_event handler from <module 'rules.on_event_foo' from '/home/cloud-user/powny-cli-test/powny-load-test-rules/rules/on_event_foo.py'>
 DEBUG:raava.rules:Applied: 0a8e1c3c-b573-4688-9a67-d9f35d56496e --> rules.on_event_foo_3.on_event
 DEBUG:raava.rules:Applied: 0a8e1c3c-b573-4688-9a67-d9f35d56496e --> rules.on_event_foo_2.on_event
 DEBUG:raava.rules:Applied: 0a8e1c3c-b573-4688-9a67-d9f35d56496e --> rules.on_event_foo.on_event
@@ -94,41 +97,41 @@ INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): 
 DEBUG:requests.packages.urllib3.connectionpool:"GET / HTTP/1.1" 200 1270
 INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): example.com
 DEBUG:requests.packages.urllib3.connectionpool:"GET / HTTP/1.1" 200 1270
-INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): gns-testing.example.net
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): powny-testing.example.net
 DEBUG:requests.packages.urllib3.connectionpool:"GET / HTTP/1.1" 200 226
-DEBUG:gnshelpers.output.via_email:Sending email to: ['alexanderk@example-team.ru']; cc: []; via SMTP None@localhost
-INFO:gnshelpers.output.via_email:Email sent to: ['alexanderk@example-team.ru']; cc: []
+DEBUG:pownyhelpers.output.via_email:Sending email to: ['alexanderk@example-team.ru']; cc: []; via SMTP None@localhost
+INFO:pownyhelpers.output.via_email:Email sent to: ['alexanderk@example-team.ru']; cc: []
 ```
 
 Если `powny-cli` настроен верно, то вы получите все необходимые уведомления.
  
-### Получить информацию о GNS кластере
+### Получить информацию о Powny-кластере
 
 ```bash
-$ powny-cli gns --api-url=http://gns-testing.example.net:7887 cluster-info
+$ powny-cli powny --api-url=http://powny-testing.example.net:7887 cluster-info
 ```
 
 *Output:*
 
 ```
-INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): gns-testing.example.net
-{'collector': {'96365003-b273-46a5-b4c6-8ee984a91c2a@gns-collector-localship': {'host': {'fqdn': 'gns-collector-localship',
-                                                                                         'node': 'gns-collector-localship'},
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): powny-testing.example.net
+{'collector': {'96365003-b273-46a5-b4c6-8ee984a91c2a@powny-collector-localship': {'host': {'fqdn': 'powny-collector-localship',
+                                                                                         'node': 'powny-collector-localship'},
                                                                                 'threads': {'die_after': None,
                                                                                             'respawns': 1,
                                                                                             'workers_limit': 1},
                                                                                 'when': '2014-07-29T11:10:55Z'}},
- 'splitter': {'0f8ee3be-9148-49fd-bb20-ea3e65b0a590@gns-splitter-localship': {'host': {'fqdn': 'gns-splitter-localship',
-                                                                                       'node': 'gns-splitter-localship'},
+ 'splitter': {'0f8ee3be-9148-49fd-bb20-ea3e65b0a590@powny-splitter-localship': {'host': {'fqdn': 'powny-splitter-localship',
+                                                                                       'node': 'powny-splitter-localship'},
                                                                               'loader': {'last_commit': '33a72fe756df6834f78bc2916651dfba2896d03f',
                                                                                          'last_head': 'git_33a72fe756df6834f78bc2916651dfba2896d03f',
-                                                                                         'rules_dir': '/var/lib/gns/rules'},
+                                                                                         'rules_dir': '/var/lib/powny/rules'},
                                                                               'threads': {'die_after': None,
                                                                                           'respawns': 1,
                                                                                           'workers_limit': 1},
                                                                               'when': '2014-07-29T11:10:53Z'}},
- 'worker': {'d6f2b259-433b-4d60-b205-33b9867a2f65@gns-worker-localship': {'host': {'fqdn': 'gns-worker-localship',
-                                                                                   'node': 'gns-worker-localship'},
+ 'worker': {'d6f2b259-433b-4d60-b205-33b9867a2f65@powny-worker-localship': {'host': {'fqdn': 'powny-worker-localship',
+                                                                                   'node': 'powny-worker-localship'},
                                                                           'threads': {'die_after': None,
                                                                                       'respawns': 1,
                                                                                       'workers_limit': 1},
@@ -139,42 +142,42 @@ INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): 
 ### Получить список активных заданий
 
 ```bash
-$ powny-cli gns --api-url=http://gns-testing.example.net:7887 job-list
+$ powny-cli powny --api-url=http://powny-testing.example.net:7887 job-list
 ```
 
 ### Остановить задачу по UUID
 
 ```bash
-$ powny-cli gns --api-url=http://gns-testing.example.net:7887 kill-job _JOB_UUID_
+$ powny-cli powny --api-url=http://powny-testing.example.net:7887 kill-job _JOB_UUID_
 ```
 
 
-### Послать событие в GNS
+### Послать событие в Powny
 
 Если событие простое (состоит из полей `host`, `service`, `severity`), то описание может быть переданно как аргументы:
 
 ```bash
-$ powny-cli gns --api-url=http://gns-testing.example.net:7887 send-event http://example.com golem CRIT
+$ powny-cli powny --api-url=http://powny-testing.example.net:7887 send-event http://example.com golem CRIT
 ```
 
 Так же, событие может быть описано в файле, который задаётся опцией `--file`:
 
 ```bash
-$ powny-cli gns --api-url=http://gns-testing.example.net:7887 send-event --file event.json
+$ powny-cli powny --api-url=http://powny-testing.example.net:7887 send-event --file event.json
 ```
 
 *Output:*
 
 ```
 INFO:pownycli.client:Send event: {'host': 'http://example.com', 'service': 'golem', 'severity': 'CRIT'}
-INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): gns-testing.example.net
-INFO:pownycli.gnsapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa8f82d
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): powny-testing.example.net
+INFO:pownycli.pownyapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa8f82d
 ```
 
 О настройке и опциях
 ---------
 При установке с пакетом поставляется конфиг по умолчанию.
-Что бы внести изменения в конфигурацию, необходимые опции можно переписать в файле `~/.config/powny-cli/config.yaml`,
+Чтобы внести изменения в конфигурацию, необходимые опции можно переписать в файле `~/.config/powny-cli/config.yaml`,
 или передать опцию `powny-cli --config=my_config.yaml`.
 
 Можно использовать опцию `--debug` для более подробного вывода. По умолчанию, уровень `INFO`.
@@ -184,8 +187,8 @@ INFO:pownycli.gnsapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa8f
 Например:
 
 ```bash
-cat event.json |  powny-cli gns --api-url=http://gns-testing.example.net:7887 send-event --file -
+cat event.json |  powny-cli powny --api-url=http://powny-testing.example.net:7887 send-event --file -
 ```
 
-Опция `--api-url` может быть задана в переменной окружения `GNS_API_URL` или определёна в конфиге
- (например, `gns_api_url: http://localhost:7887/api`).
+Опция `--api-url` может быть задана в переменной окружения `POWNY_API_URL` или определёна в конфиге
+ (например, `powny_api_url: http://localhost:7887/api`).
