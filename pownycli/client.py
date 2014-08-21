@@ -9,12 +9,15 @@ import requests
 import yaml
 import webbrowser
 import shutil
+import tabloid
+from datetime import datetime as dt
 from pownycli.settings import Settings
 from pownycli import uploader
 from pownycli import pownyapi
 from pownycli import checker
 from pkg_resources import resource_stream
 from requests.compat import urljoin
+from pownycli.util import Colorfull
 
 
 logger = logging.getLogger(__name__)
@@ -123,27 +126,49 @@ def job_logs(job_id, size):
                         params={'q': 'job_id:%s' % job_id, 'size': size})
     hits = resp.json()['hits']['hits']
     hits.sort(key=lambda x: x["_source"]["@timestamp"])
+
+    lines = []
     for hit in hits:
         fields = hit["_source"]
-        msg = fields["msg"]
+        message = fields["msg"]
         args = fields.get("args")
-        time = fields["@timestamp"]
+        time = dt.strptime(fields["@timestamp"], "%Y-%m-%dT%H:%M:%S.%f").strftime("%d %b %H:%M:%S")
         level = fields["level"]
         node = fields["node"]
 
         if logger.getEffectiveLevel() != logging.DEBUG and level == 'DEBUG':
             continue
 
-        msg = "{node}: {time} {level} {msg}".format(node=node, time=time, msg=msg, level=level)
+        node_name, node_role = node.split('-')[0], node.split('-')[1]
+
         if args:
             try:
-                # To catch cases when `msg = '%s (parents: %s)'`, but `args = ['Spawned the new job']`
-                click.echo(msg % tuple(args))
+                # To catch cases when `message = '%s (parents: %s)'`, but `args = ['Spawned the new job']`
+                formatted_msg = message % tuple(args)
             except TypeError as error:
                 logger.warning("Can't format string. %s. So next record is a raw.", error)
-                click.echo(msg+str(args))
+                formatted_msg = message + str(args)
         else:
-            click.echo(msg)
+            formatted_msg = message
+
+        lines.append([node_name, node_role, time, level, formatted_msg])
+
+    table = tabloid.FormattedTable()
+    table.add_column('Role')
+    table.add_column('Node', Colorfull.get_node)
+    table.add_column('Time', Colorfull.timestamp)
+    table.add_column('Level', Colorfull.get_level)
+    table.add_column('Message')
+
+    for line in lines:
+        table.add_row(line)
+
+    formatted_out = '\n'.join(table.get_table())
+
+    if formatted_out:
+        click.echo(formatted_out)
+    else:
+        click.echo("No logs yet.")
 
 
 @cli.group()
