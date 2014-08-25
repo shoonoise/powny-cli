@@ -67,19 +67,40 @@ def upload(powny_server: str, path: str, message: str, force: bool):
         - git push ssh://git@powny/remote.git # to each Powny git
     and POST new HEAD hash to Powny via API
     """
-    status = _execute_git_command('status', path, "Can't get git status").split('\n')
+    status = _execute_git_command('status --porcelain', path, "Can't get git status")
 
-    if 'nothing to commit, working directory clean' in status[3]:
-        logger.info("There is no changes.")
-    elif 'nothing added to commit but untracked files present' in status[-2]:
-        logger.info("There is no changes, but new files present. Use `rules add` command to add new rule")
+    if len(status) == 0:
+        logger.info("There are no new or modified rules.")
+        return
     else:
-        logger.info("Commit current changes...")
-        if not message:
-            logger.info("`--message` option was not specified")
-            message = input("Enter commit message: ")
-        _execute_git_command('commit -a -m "{}"'.format(message), path,
-                             "Can't commit your changes")
+        commit_needed = False
+        for changed_file in filter(len, status.split('\n')):
+            file_status, file_name = filter(len, changed_file.split(' '))
+            if file_status == "A":
+                logger.info("New rule '%s' was added", file_name)
+                commit_needed = True
+            elif file_status == "M":
+                logger.info("Rule '%s' was modified", file_name)
+                commit_needed = True
+            elif file_status == "D":
+                logger.info("Rule '%s' will be removed", file_name)
+                commit_needed = True
+            elif file_status == "??":
+                logger.info("New rule '%s' is present. Use `rules add` command to add the rule", file_name)
+            else:
+                raise RuntimeError("Unknown status %s for file %s", file_status, file_name)
+
+    if not commit_needed:
+        return
+
+    logger.info("Commit current changes...")
+
+    if not message:
+        logger.info("`--message` option was not specified")
+        message = input("Enter commit message: ")
+
+    _execute_git_command('commit -a -m "{}"'.format(message), path,
+                         "Can't commit your changes")
 
     logger.info("Pull changes from rules server...")
 
