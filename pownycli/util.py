@@ -7,7 +7,7 @@ class Colorfull:
     colors = cycle((Fore.BLUE, Fore.MAGENTA, Fore.CYAN))
 
     @classmethod
-    def get_node(cls, node):
+    def get_node(cls, node, _):
         if node in cls.nodes:
             return cls.nodes[node]
         else:
@@ -15,10 +15,10 @@ class Colorfull:
             return cls.nodes[node]
 
     @classmethod
-    def get_level(cls, level):
+    def get_level(cls, level, _):
         return {'DEBUG': '{}{}{}'.format(Fore.WHITE, level, Style.RESET_ALL),
                 'INFO': '{}{}{}'.format(Fore.GREEN, level, Style.RESET_ALL)}.get(level.strip(), level)
 
     @classmethod
-    def timestamp(cls, timestamp):
+    def timestamp(cls, timestamp, _):
         return '{}{}{}'.format(Fore.YELLOW, timestamp, Style.RESET_ALL)
