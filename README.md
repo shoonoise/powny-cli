@@ -154,7 +154,7 @@ $ powny-cli powny --api-url=http://powny-testing.example.net:7887 kill-job _JOB_
 
 ### Послать событие в Powny
 
-Если событие простое (состоит из полей `host`, `service`, `severity`), то описание может быть переданно как аргументы:
+Если событие простое (состоит из полей `host`, `service`, `status`), то описание может быть переданно как аргументы:
 
 ```bash
 $ powny-cli powny --api-url=http://powny-testing.example.net:7887 send-event http://example.com golem CRIT
@@ -169,7 +169,7 @@ $ powny-cli powny --api-url=http://powny-testing.example.net:7887 send-event --f
 *Output:*
 
 ```
-INFO:pownycli.client:Send event: {'host': 'http://example.com', 'service': 'golem', 'severity': 'CRIT'}
+INFO:pownycli.client:Send event: {'host': 'http://example.com', 'service': 'golem', 'status': 'CRIT'}
 INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): powny-testing.example.net
 INFO:pownycli.pownyapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa8f82d
 ```
