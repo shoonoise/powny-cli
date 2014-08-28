@@ -1,6 +1,6 @@
 interactions:
 - request:
-    body: '{"service": "GNS", "severity": "CRIT", "host": "http://host.net"}'
+    body: '{"service": "GNS", "status": "CRIT", "host": "http://host.net"}'
     headers:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']

@@ -56,9 +56,9 @@ def _read_powny_api_url_from_settings(ctx, param, api_url):
 
 def _get_event_from_args(event_args):
     if event_args and len(event_args) == 3:
-        return {'host': event_args[0], 'service': event_args[1], 'severity': event_args[2]}
+        return {'host': event_args[0], 'service': event_args[1], 'status': event_args[2]}
     else:
-        raise click.BadParameter("You mast pass `host service severity` args or `--file` option")
+        raise click.BadParameter("You mast pass `host service status` args or `--file` option")
 
 
 @click.group()
@@ -273,7 +273,7 @@ def kill_job(api_url, job_id):
 def send_event(api_url, event_args, file):
     """
     Send event to Powny via API.
-    Could be called with arguments `host service severity` or with JSON file event description.
+    Could be called with arguments `host service status` or with JSON file event description.
     """
 
     event = file or _get_event_from_args(event_args)
