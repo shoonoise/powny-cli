@@ -209,7 +209,7 @@ def add(rules_path, file_name):
 
 @rules.command("exec")
 @click.argument('event_args', nargs=-1, required=False)
-@click.option('--event-desc', '-e', required=True, type=click.File('r'),
+@click.option('--event-desc', '-e', type=click.File('r'),
               callback=_validate_event_desc, help="JSON file with event description")
 @click.pass_obj
 def execute(rules_path, event_desc, event_args):
