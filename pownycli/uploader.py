@@ -71,7 +71,6 @@ def upload(powny_server: str, path: str, message: str, force: bool):
 
     if len(status) == 0:
         logger.info("There are no new or modified rules.")
-        return
     else:
         commit_needed = False
         for changed_file in filter(len, status.split('\n')):
@@ -90,17 +89,15 @@ def upload(powny_server: str, path: str, message: str, force: bool):
             else:
                 raise RuntimeError("Unknown status %s for file %s", file_status, file_name)
 
-    if not commit_needed:
-        return
+        if commit_needed:
+            logger.info("Commit current changes...")
 
-    logger.info("Commit current changes...")
+            if not message:
+                logger.info("`--message` option was not specified")
+                message = input("Enter commit message: ")
 
-    if not message:
-        logger.info("`--message` option was not specified")
-        message = input("Enter commit message: ")
-
-    _execute_git_command('commit -a -m "{}"'.format(message), path,
-                         "Can't commit your changes")
+            _execute_git_command('commit -a -m "{}"'.format(message), path,
+                                 "Can't commit your changes")
 
     logger.info("Pull changes from rules server...")
 
