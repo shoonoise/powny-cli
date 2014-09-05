@@ -84,8 +84,7 @@ def gen_config(force):
     """
     config_dir = '~/.config/powny-cli/'
     full_conf_dir = os.path.expanduser(config_dir)
-    if not os.path.exists(full_conf_dir):
-        os.mkdir(full_conf_dir)
+    os.makedirs(full_conf_dir, exist_ok=True)
     full_config_path = os.path.join(full_conf_dir, 'config.yaml')
     if os.path.exists(full_config_path):
         if force:
