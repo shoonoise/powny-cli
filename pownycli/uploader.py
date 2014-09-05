@@ -34,7 +34,10 @@ def _update_head(powny_server: str, path: str):
 
 def _execute_git_command(cmd: str, path, err_msg: str):
     git_warn_exit_code = 1
-    full_cmd = 'git --git-dir={path}/.git --work-tree={path} {cmd}'.format(cmd=cmd, path=path)
+    if path is not None:
+        full_cmd = 'git --git-dir={path}/.git --work-tree={path} {cmd}'.format(cmd=cmd, path=path)
+    else:
+        full_cmd = cmd
     logger.debug("Execute command: %s", full_cmd)
     result = envoy.run(full_cmd)
     out, err, exit_code = result.std_out, result.std_err, result.status_code
@@ -51,6 +54,13 @@ def _execute_git_command(cmd: str, path, err_msg: str):
         return out
     else:
         return out
+
+
+def get_root(fallback):
+    try:
+        return _execute_git_command('git rev-parse --show-toplevel', None, "Can't find Git repo").strip()
+    except GitCommandError:
+        return fallback
 
 
 def add(path: str, file_name: str):

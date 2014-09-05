@@ -172,7 +172,7 @@ def job_logs(job_id, size):
 
 @cli.group()
 @click.option('--rules-path', '-r', type=click.Path(exists=True), envvar='POWNY_RULES_PATH',
-              callback=_validate_repo_path, default='.', help="Path to rules dir")
+              callback=_validate_repo_path, default=uploader.get_root(fallback="."), help="Path to rules dir")
 @click.pass_context
 def rules(ctx, rules_path):
     """
