@@ -20,16 +20,30 @@ def _multiline_log(level: int, prefix: str, out_lines: str):
             logger.log(level, prefix, line)
 
 
+def _show_rules_info(powny_server: str):
+    info = pownyapi.get_rules_info(powny_server)
+    if len(info['errors']) != 0:
+        logger.warning("Cannot load some modules for HEAD=%s:", info['head'])
+        for (module_name, exc) in info['errors'].items():
+            logger.warning("Error in '%s':\n%s", module_name, exc)
+    for dest in ('methods', 'handlers'):
+        if len(info['exposed'][dest]) != 0:
+            logger.debug("Exposed %s:", dest)
+            for func_name in info['exposed'][dest]:
+                logger.debug(" --- %s", func_name)
+
+
 def _update_head(powny_server: str, path: str):
     new_head = _execute_git_command("rev-parse HEAD", path, err_msg="Can't update HEAD").strip()
     logger.debug("Local HEAD is %s", new_head)
-    current_head = pownyapi.get_header(powny_server)
+    current_head = pownyapi.get_rules_info(powny_server)['head']
     logger.debug("Remote HEAD is %s", current_head)
     if new_head == current_head:
         logger.info("HEAD already updated")
         return
     logger.debug("Update HEAD to %s", new_head)
     pownyapi.set_header(powny_server, new_head)
+    _show_rules_info(powny_server)
 
 
 def _execute_git_command(cmd: str, path, err_msg: str):

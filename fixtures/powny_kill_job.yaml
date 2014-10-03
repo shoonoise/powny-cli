@@ -4,17 +4,18 @@ interactions:
     headers:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
       Content-Length: ['0']
-      User-Agent: [python-requests/2.3.0 CPython/3.4.0 Darwin/13.3.0]
+      User-Agent: [python-requests/2.4.1 CPython/3.4.1 Linux/3.13.8-1-aufs_friendly]
     method: DELETE
-    uri: http://localhost:7887/api/rest/v1/jobs/87311816-d0ad-4668-b1cd-6e095d9d01da
+    uri: http://localhost/v1/jobs/baca2a09-e510-4851-8a05-2f732582249d
   response:
-    body: {string: '{"status": "ok"}'}
+    body: {string: '{"status": "ok", "message": "The job has been removed", "result":
+        {"deleted": "baca2a09-e510-4851-8a05-2f732582249d"}}'}
     headers:
-      Allow: ['DELETE, GET, HEAD, POST']
-      Content-Length: ['16']
+      Content-Length: ['118']
       Content-Type: [application/json]
-      Date: ['Wed, 30 Jul 2014 16:39:16 GMT']
-      Server: [CherryPy/3.5.0]
+      Date: ['Fri, 03 Oct 2014 11:23:52 GMT']
+      Server: [Werkzeug/0.9.6 Python/3.2.5]
     status: {code: 200, message: OK}
 version: 1
