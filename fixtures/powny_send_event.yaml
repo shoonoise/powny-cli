@@ -1,21 +1,23 @@
 interactions:
 - request:
-    body: '{"service": "GNS", "status": "CRIT", "host": "http://host.net"}'
+    body: '{"host": "http://host.net", "status": "CRIT", "service": "GNS"}'
     headers:
       Accept: ['*/*']
       Accept-Encoding: ['gzip, deflate']
-      Content-Length: ['65']
-      User-Agent: [python-requests/2.3.0 CPython/3.4.0 Darwin/13.3.0]
+      Connection: [keep-alive]
+      Content-Length: ['63']
+      User-Agent: [python-requests/2.4.1 CPython/3.4.1 Linux/3.13.8-1-aufs_friendly]
       content-type: [application/json]
     method: POST
-    uri: http://localhost:7887/api/rest/v1/jobs
+    uri: http://localhost/v1/jobs
   response:
-    body: {string: '{"status": "ok", "id": "fbb9bf7d-f391-4a97-8ff4-839890ecd84e"}'}
+    body: {string: '{"status": "ok", "message": "Handlers were launched", "result":
+        {"79232e70-4adc-4196-8184-6058be281e8e": {"url": "http://localhost/v1/jobs/79232e70-4adc-4196-8184-6058be281e8e",
+        "method": "rules.test.empty_handler"}}}'}
     headers:
-      Allow: ['DELETE, GET, HEAD, POST']
-      Content-Length: ['62']
+      Content-Length: ['222']
       Content-Type: [application/json]
-      Date: ['Thu, 31 Jul 2014 09:25:58 GMT']
-      Server: [CherryPy/3.5.0]
+      Date: ['Fri, 03 Oct 2014 11:23:52 GMT']
+      Server: [Werkzeug/0.9.6 Python/3.2.5]
     status: {code: 200, message: OK}
 version: 1

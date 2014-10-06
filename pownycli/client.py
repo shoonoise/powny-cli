@@ -249,7 +249,7 @@ def job_list(api_url):
     Show current jobs list by id.
     """
     jobs = pownyapi.get_jobs(api_url)
-    click.echo(pprint.pformat(jobs))
+    click.echo(pprint.pformat(list(jobs)))
 
 
 @powny.command("kill-job")

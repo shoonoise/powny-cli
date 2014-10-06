@@ -39,7 +39,7 @@ $ vim rules/on_event_bar.py
 + Чтобы загрузить правила в Powny, выполните:
 
 ```bash
-$ powny-cli rules upload -m "Change rule" --api-url=http://powny-testing.example.net:7887
+$ powny-cli rules upload -m "Change rule" --api-url=http://powny-testing.example.net
 ```
 
 > Эта команда пытается синхронизировать ваши изменения с удалённым репозиторием правил, с которым вы работаете.
@@ -108,7 +108,7 @@ INFO:pownyhelpers.output.via_email:Email sent to: ['alexanderk@example-team.ru']
 ### Получить информацию о Powny-кластере
 
 ```bash
-$ powny-cli powny --api-url=http://powny-testing.example.net:7887 cluster-info
+$ powny-cli powny --api-url=http://powny-testing.example.net cluster-info
 ```
 
 *Output:*
@@ -142,13 +142,13 @@ INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): 
 ### Получить список активных заданий
 
 ```bash
-$ powny-cli powny --api-url=http://powny-testing.example.net:7887 job-list
+$ powny-cli powny --api-url=http://powny-testing.example.net job-list
 ```
 
 ### Остановить задачу по UUID
 
 ```bash
-$ powny-cli powny --api-url=http://powny-testing.example.net:7887 kill-job _JOB_UUID_
+$ powny-cli powny --api-url=http://powny-testing.example.net kill-job _JOB_UUID_
 ```
 
 
@@ -157,13 +157,13 @@ $ powny-cli powny --api-url=http://powny-testing.example.net:7887 kill-job _JOB_
 Если событие простое (состоит из полей `host`, `service`, `status`), то описание может быть переданно как аргументы:
 
 ```bash
-$ powny-cli powny --api-url=http://powny-testing.example.net:7887 send-event http://example.com golem CRIT
+$ powny-cli powny --api-url=http://powny-testing.example.net send-event http://example.com golem CRIT
 ```
 
 Так же, событие может быть описано в файле, который задаётся опцией `--file`:
 
 ```bash
-$ powny-cli powny --api-url=http://powny-testing.example.net:7887 send-event --file event.json
+$ powny-cli powny --api-url=http://powny-testing.example.net send-event --file event.json
 ```
 
 *Output:*
@@ -187,8 +187,8 @@ INFO:pownycli.pownyapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa
 Например:
 
 ```bash
-cat event.json |  powny-cli powny --api-url=http://powny-testing.example.net:7887 send-event --file -
+cat event.json |  powny-cli powny --api-url=http://powny-testing.example.net send-event --file -
 ```
 
 Опция `--api-url` может быть задана в переменной окружения `POWNY_API_URL` или определёна в конфиге
- (например, `powny_api_url: http://localhost:7887/api`).
+ (например, `powny_api_url: http://localhost/api`).

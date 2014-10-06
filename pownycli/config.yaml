@@ -1,7 +1,7 @@
 powny_git_remotes:
   - ssh://git@localhost:2022/var/lib/powny/rules.git
 
-powny_api_url: http://localhost:7887/api
+powny_api_url: http://localhost/api
 
 kibana_dashboard_url: https://localhost/index.html#/dashboard/elasticsearch/powny
 
