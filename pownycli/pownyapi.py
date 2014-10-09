@@ -43,6 +43,7 @@ def send_event(powny_server: str, event_desc: dict):
 
 
 def terminate_job(powny_server: str, job_id: str):
+    logger.info("Try to kill job {}".format(job_id))
     resp = requests.delete(powny_server + '/v1/jobs/{}'.format(job_id))
 
     if resp.status_code == 404:
@@ -75,7 +76,7 @@ def get_rules_info(powny_server: str):
     try:
         resp.raise_for_status()
     except requests.HTTPError:
-        raise PownyAPIException("Can't get the rules info.")
+        raise PownyAPIException("Can't get the rules info. {}".format(resp.content))
     else:
         return resp.json()['result']
 

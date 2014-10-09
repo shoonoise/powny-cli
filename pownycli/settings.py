@@ -8,12 +8,17 @@ logger = logging.getLogger(__name__)
 
 class Settings:
 
-    config = None
+    config = {}
 
     @classmethod
     def get(cls, key, default=None):
         if cls.config:
-            return cls.config.get(key, default)
+            value = cls.config.get(key, default)
+            if value is None:
+                logger.debug("{} set to None. May be powny-cli misconfigured".format(key))
+            return value
+        else:
+            raise RuntimeError("powny-cli misconfigured.")
 
     @classmethod
     def load(cls, ctx, param, file):
@@ -21,9 +26,10 @@ class Settings:
            in any other cases loads config by default paths"""
         if file:
             logger.debug("Load config from %s", file)
-            cls.config = yaml.load(file)
+            added_config = yaml.load(file) or {}
+            cls.config.update(added_config)
         else:
-            config = yaml.load(resource_stream(__name__, 'config.yaml'))
+            cls.config = yaml.load(resource_stream(__name__, 'config.yaml'))
             logger.debug("Load default config")
             path_to_user_config = os.path.expanduser('~/.config/powny-cli/config.yaml')
             if os.path.exists(path_to_user_config):
@@ -33,5 +39,4 @@ class Settings:
                 except (TypeError, ValueError) as error:
                     logger.warning("Can't load user config. %s", error)
                 else:
-                    config.update(user_conf)
-            cls.config = config
+                    cls.config.update(user_conf)

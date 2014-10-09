@@ -10,13 +10,40 @@ Powny command line tools облегчает взаимодействие с Pown
 -------
 В общем случае, должно быть достаточно выполнить:
 
-`pip install powny-cli`
+`pip3 install powny-cli`
 
 > Утилита протестированна *только* с python >= 3.3
 
 Рекомендуется устанавливать в `virtualenv`.
 
 *Утилита тянет с собой не мало зависимостей (в основном, для локального выполнения правил), будьте к этому готовы*
+
+Подготовка к работе
+------
+Что бы начать работать с powny-cli выполните:
+
+- `git clone ${git_url} ${target_path}`
+
+- `cd ${target_path}`
+
+- `git checkout ${branch}` (опционально)
+
+После этого powny-cli будет использовать настройки, которые определены в файле `${target_path}/pownyrules.yaml`.
+
+При установке с пакетом поставляется конфиг по умолчанию (сейчас используется только для настроек логгирования).
+Чтобы внести изменения в конфигурацию, необходимые опции можно переписать в файле `~/.config/powny-cli/config.yaml`,
+или передать опцию `powny-cli --config=my_config.yaml`.
+
+Можно использовать опцию `--debug` для более подробного вывода. По умолчанию, уровень логгирования `INFO`.
+
+Опции, предназначенные для файлов, могут быть выставленны в `-`, в таком случае, вместо файла будет читаться `stdin`.
+
+
+*Например:*
+
+```bash
+cat event.json |  powny-cli powny --api-url=http://powny-testing.example.net send-event --file -
+```
 
 Что умеет powny-cli
 -------
@@ -39,7 +66,7 @@ $ vim rules/on_event_bar.py
 + Чтобы загрузить правила в Powny, выполните:
 
 ```bash
-$ powny-cli rules upload -m "Change rule" --api-url=http://powny-testing.example.net
+$ powny-cli rules upload
 ```
 
 > Эта команда пытается синхронизировать ваши изменения с удалённым репозиторием правил, с которым вы работаете.
@@ -53,8 +80,6 @@ INFO:pownycli.uploader:Commit current changes...
 INFO:pownycli.uploader:Pull changes from rules server...
 INFO:pownycli.uploader:Sync you changes with rules server...
 INFO:pownycli.uploader:Upload rules to ssh://git@powny-testing.example.net:2022/var/lib/powny/rules.git...
-INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): powny-testing.example.net
-INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): powny-testing.example.net
 INFO:pownycli.pownyapi:Set new head: 2238e6636063b57b541c0f1799596e1617dec489
 INFO:pownycli.uploader:You rules uploaded to Powny!
 ```
@@ -74,7 +99,7 @@ $ cat event.json
 Чтобы выполнить правило запустите:
 
 ```bash
-$ powny-cli --debug rules -r powny-rules exec -e event.json
+$ powny-cli --debug rules exec -e event.json
 ```
 
 *Output:*
@@ -103,12 +128,10 @@ DEBUG:pownyhelpers.output.via_email:Sending email to: ['alexanderk@example-team.
 INFO:pownyhelpers.output.via_email:Email sent to: ['alexanderk@example-team.ru']; cc: []
 ```
 
-Если `powny-cli` настроен верно, то вы получите все необходимые уведомления.
- 
 ### Получить информацию о Powny-кластере
 
 ```bash
-$ powny-cli powny --api-url=http://powny-testing.example.net cluster-info
+$ powny-cli cluster-info
 ```
 
 *Output:*
@@ -142,13 +165,13 @@ INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): 
 ### Получить список активных заданий
 
 ```bash
-$ powny-cli powny --api-url=http://powny-testing.example.net job-list
+$ powny-cli job list
 ```
 
 ### Остановить задачу по UUID
 
 ```bash
-$ powny-cli powny --api-url=http://powny-testing.example.net kill-job _JOB_UUID_
+$ powny-cli job kill _JOB_UUID_
 ```
 
 
@@ -157,13 +180,13 @@ $ powny-cli powny --api-url=http://powny-testing.example.net kill-job _JOB_UUID_
 Если событие простое (состоит из полей `host`, `service`, `status`), то описание может быть переданно как аргументы:
 
 ```bash
-$ powny-cli powny --api-url=http://powny-testing.example.net send-event http://example.com golem CRIT
+$ powny-cli job send-event http://example.com golem CRIT
 ```
 
 Так же, событие может быть описано в файле, который задаётся опцией `--file`:
 
 ```bash
-$ powny-cli powny --api-url=http://powny-testing.example.net send-event --file event.json
+$ powny-cli job send-event --file event.json
 ```
 
 *Output:*
@@ -174,21 +197,3 @@ INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): 
 INFO:pownycli.pownyapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa8f82d
 ```
 
-О настройке и опциях
----------
-При установке с пакетом поставляется конфиг по умолчанию.
-Чтобы внести изменения в конфигурацию, необходимые опции можно переписать в файле `~/.config/powny-cli/config.yaml`,
-или передать опцию `powny-cli --config=my_config.yaml`.
-
-Можно использовать опцию `--debug` для более подробного вывода. По умолчанию, уровень `INFO`.
-
-Опции, предназначенные для файлов, могут быть выставленны в `-`, в таком случае, вместо файла будет читаться `stdin`.
-
-Например:
-
-```bash
-cat event.json |  powny-cli powny --api-url=http://powny-testing.example.net send-event --file -
-```
-
-Опция `--api-url` может быть задана в переменной окружения `POWNY_API_URL` или определёна в конфиге
- (например, `powny_api_url: http://localhost/api`).

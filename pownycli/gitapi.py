@@ -70,6 +70,10 @@ def _execute_git_command(cmd: str, path, err_msg: str):
         return out
 
 
+def _get_current_branch(path):
+    return _execute_git_command("rev-parse --abbrev-ref HEAD", path, "Can't get current branch").strip()
+
+
 def get_root(fallback):
     try:
         return _execute_git_command('git rev-parse --show-toplevel', None, "Can't find Git repo").strip()
@@ -82,10 +86,9 @@ def add(path: str, file_name: str):
     logger.info("New rule %s added", file_name)
 
 
-def upload(powny_server: str, path: str, message: str, force: bool):
+def upload(powny_server: str, path: str, force: bool):
     """
     This function execute git commands:
-        - git commit -a -m "{message}"
         - git pull --rebase
         - git push # to origin
         - git push ssh://git@powny/remote.git # to each Powny git
@@ -93,35 +96,9 @@ def upload(powny_server: str, path: str, message: str, force: bool):
     """
     status = _execute_git_command('status --porcelain', path, "Can't get git status")
 
-    if len(status) == 0:
-        logger.info("There are no new or modified rules.")
-    else:
-        commit_needed = False
-        for changed_file in filter(len, status.split('\n')):
-            file_status, file_name = filter(len, changed_file.split(' '))
-            if file_status == "A":
-                logger.info("New rule '%s' was added", file_name)
-                commit_needed = True
-            elif file_status == "M":
-                logger.info("Rule '%s' was modified", file_name)
-                commit_needed = True
-            elif file_status == "D":
-                logger.info("Rule '%s' will be removed", file_name)
-                commit_needed = True
-            elif file_status == "??":
-                logger.info("New rule '%s' is present. Use `rules add` command to add the rule", file_name)
-            else:
-                raise RuntimeError("Unknown status %s for file %s", file_status, file_name)
-
-        if commit_needed:
-            logger.info("Commit current changes...")
-
-            if not message:
-                logger.info("`--message` option was not specified")
-                message = input("Enter commit message: ")
-
-            _execute_git_command('commit -a -m "{}"'.format(message), path,
-                                 "Can't commit your changes")
+    if len(status) > 0:
+        logger.info("You have uncommited changes in working directory. Please commit them before upload.")
+        raise GitCommandError
 
     logger.info("Pull changes from rules server...")
 
@@ -134,10 +111,11 @@ def upload(powny_server: str, path: str, message: str, force: bool):
 
     powny_repos = Settings.get("powny_git_remotes")
     assert powny_repos, "Powny git remotes does not defined. Can't upload rules."
+    current_branch = _get_current_branch(path)
     for repo in powny_repos:
         logger.info("Upload rules to {}...".format(repo))
-        cmd = 'push --force {} master' if force else 'push {} master'
-        _execute_git_command(cmd.format(repo), path, "Can't push to Powny remote")
+        cmd = 'push --force {} {}:master' if force else 'push {} {}:master'
+        _execute_git_command(cmd.format(repo, current_branch), path, "Can't push to Powny remote")
 
     logger.debug("Update head...")
     _update_head(powny_server, path)

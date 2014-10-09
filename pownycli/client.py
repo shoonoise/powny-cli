@@ -4,18 +4,17 @@ import os
 import sys
 import logging
 import logging.config
-import pprint
 import requests
+import shutil
 import yaml
 import webbrowser
-import shutil
 import tabloid
+from pkg_resources import resource_stream
 from datetime import datetime as dt
 from pownycli.settings import Settings
-from pownycli import uploader
+from pownycli import gitapi
 from pownycli import pownyapi
 from pownycli import checker
-from pkg_resources import resource_stream
 from requests.compat import urljoin
 from pownycli.util import Colorfull
 
@@ -25,9 +24,9 @@ logger = logging.getLogger(__name__)
 
 def _validate_repo_path(ctx, param, value):
     listing = os.listdir(value)
-    if ('.git' not in listing) or ('.pownyrules' not in listing):
+    if ('.git' not in listing) or ('pownyrules.yaml' not in listing):
         raise click.BadParameter(
-            "{repo_path} is not git repository or file `.pownyrules` not exist!"
+            "{repo_path} is not git repository or file `pownyrules.yaml` not exist!"
             " Make sure that the path is a Powny rules repository.".format(repo_path=value))
     else:
         return value
@@ -63,8 +62,11 @@ def _get_event_from_args(event_args):
 
 @click.group()
 @click.option('--debug/--no-debug', '-d', help="Enable debug logs")
-@click.option('--config', '-c', type=click.File('r'), callback=Settings.load)
-def cli(debug, config):
+@click.option('--work-dir', '-w', type=click.Path(), envvar='POWNY_WORK_DIR',
+              callback=_validate_repo_path, default=gitapi.get_root(fallback="."), help="Path to rules dir")
+@click.option('--config', '-c', callback=Settings.load, type=click.File('r'),
+              help="Load config from file", metavar='PATH')
+def cli(debug, work_dir, config):
     """
     Powny command line tool.
     """
@@ -74,6 +76,10 @@ def cli(debug, config):
         logging.basicConfig(level=logging.INFO)
 
     logging.config.dictConfig(Settings.get('logging', {}))
+    # `pownyrules.yaml` from work dir has highest priority
+    with open(os.path.join(work_dir, 'pownyrules.yaml')) as repo_conf:
+        Settings.load(None, None, repo_conf)
+    Settings.config['rules-path'] = work_dir
 
 
 @cli.command("create-config")
@@ -116,7 +122,54 @@ def open_log_page(browser):
         logger.error("Can't open %s in %s browser. Error occurred: %s", url, browser or "default", error)
 
 
-@cli.command("job-logs")
+@cli.command("cluster-info")
+def cluster_info():
+    """
+    Show generic cluster info.
+    """
+    powny_state = pownyapi.get_cluster_info(Settings.get('powny_api_url'))
+    click.echo(yaml.dump(powny_state))
+
+
+@cli.group()
+def rules():
+    """
+    Manage Powny rules.
+    """
+
+
+@rules.command()
+@click.option('--force/--no-force', '-f', help="Force to upload rules")
+def upload(force):
+    """
+    Upload new or changed rules in Powny.
+    """
+    logger.info("Upload updated rules to Powny...")
+    gitapi.upload(Settings.get('powny_api_url'), Settings.get('rules-path'), force)
+
+
+@rules.command("exec")
+@click.argument('event_args', nargs=-1, required=False)
+@click.option('--event-desc', '-e', type=click.File('r'),
+              callback=_validate_event_desc, help="JSON file with event description")
+def execute(event_desc, event_args):
+    """
+    Run Powny rules locally.
+    """
+    event = event_desc or _get_event_from_args(event_args)
+
+    config = Settings.config
+    checker.check(config, Settings.get('rules_path'), event)
+
+
+@cli.group()
+def job():
+    """
+    Powny API wrapper.
+    """
+
+
+@job.command("logs")
 @click.option('--size', '-s', type=int, default=50, help="Amount of records")
 @click.argument('job_id', required=True)
 def job_logs(job_id, size):
@@ -170,106 +223,31 @@ def job_logs(job_id, size):
         click.echo("No logs yet.")
 
 
-@cli.group()
-@click.option('--rules-path', '-r', type=click.Path(exists=True), envvar='POWNY_RULES_PATH',
-              callback=_validate_repo_path, default=uploader.get_root(fallback="."), help="Path to rules dir")
-@click.pass_context
-def rules(ctx, rules_path):
-    """
-    Manage Powny rules.
-    """
-    ctx.obj = rules_path
-
-
-@rules.command()
-@click.option('--message', '-m', help="Describe you changes")
-@click.option('--force/--no-force', '-f', help="Force to upload rules")
-@click.option('--api-url', envvar='Powny_API_URL', help="Powny API URL",
-              callback=_read_powny_api_url_from_settings)
-@click.pass_obj
-def upload(rules_path, api_url, message, force):
-    """
-    Upload new or changed rules in Powny.
-    """
-    logger.info("Upload updated rules to Powny...")
-    uploader.upload(api_url, rules_path, message, force)
-
-
-@rules.command()
-@click.argument('file_name', required=True)
-@click.pass_obj
-def add(rules_path, file_name):
-    """
-    Add new file as a rule.
-    """
-    logger.info("Upload updated rules to Powny...")
-    uploader.add(rules_path, file_name)
-
-
-@rules.command("exec")
-@click.argument('event_args', nargs=-1, required=False)
-@click.option('--event-desc', '-e', type=click.File('r'),
-              callback=_validate_event_desc, help="JSON file with event description")
-@click.pass_obj
-def execute(rules_path, event_desc, event_args):
-    """
-    Run Powny rules locally.
-    """
-    event = event_desc or _get_event_from_args(event_args)
-
-    config = Settings.config
-    checker.check(config, rules_path, event)
-
-
-@cli.group()
-@click.option('--api-url', envvar='POWNY_API_URL', callback=_read_powny_api_url_from_settings,
-              help="Powny API URL", metavar="<url>")
-@click.pass_context
-def powny(ctx, api_url):
-    """
-    Powny API wrapper.
-    """
-    ctx.obj = api_url
-
-
-@powny.command("cluster-info")
-@click.pass_obj
-def cluster_info(api_url):
-    """
-    Show generic cluster info.
-    """
-    powny_state = pownyapi.get_cluster_info(api_url)
-    click.echo(yaml.dump(powny_state))
-
-
-@powny.command("job-list")
-@click.pass_obj
-def job_list(api_url):
+@job.command("list")
+def job_list():
     """
     Show current jobs list by id.
     """
-    jobs = pownyapi.get_jobs(api_url)
-    click.echo(pprint.pformat(list(jobs)))
+    jobs = pownyapi.get_jobs(Settings.get('powny_api_url'))
+    click.echo('\n'.join(list(jobs)))
 
 
-@powny.command("kill-job")
+@job.command("kill")
 @click.argument('job_id')
-@click.pass_obj
-def kill_job(api_url, job_id):
+def kill_job(job_id):
     """
     Terminate job by id.
     Now, by Powny API limitation, job just marked as `should be deleted`,
     physically it could be deleted for several time or never.
     """
-    pownyapi.terminate_job(api_url, job_id)
+    pownyapi.terminate_job(Settings.get('powny_api_url'), job_id)
 
 
-@powny.command("send-event")
+@job.command("send-event")
 @click.argument('event_args', nargs=-1, required=False)
 @click.option('--file', '-f', callback=_validate_event_desc, type=click.File('r'),
               help="Path to JSON file with event description")
-@click.pass_obj
-def send_event(api_url, event_args, file):
+def send_event(event_args, file):
     """
     Send event to Powny via API.
     Could be called with arguments `host service status` or with JSON file event description.
@@ -278,7 +256,7 @@ def send_event(api_url, event_args, file):
     event = file or _get_event_from_args(event_args)
 
     logger.info("Send event: {}".format(event))
-    pownyapi.send_event(api_url, event)
+    pownyapi.send_event(Settings.get('powny_api_url'), event)
 
 
 def main():
