@@ -89,3 +89,13 @@ def get_jobs(powny_server: str):
         raise PownyAPIException("Can't get jobs list")
     else:
         return resp.json()['result']
+
+
+def get_cluster_config(powny_server: str):
+    resp = requests.get(powny_server + '/v1/system/config')
+    try:
+        resp.raise_for_status()
+    except requests.HTTPError:
+        raise PownyAPIException("Can't get powny's cluster config from server")
+    else:
+        return resp.json()['result']

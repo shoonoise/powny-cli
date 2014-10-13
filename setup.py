@@ -34,7 +34,7 @@ if __name__ == '__main__':
           packages=['pownycli'],
           package_data={'pownycli': ['config.yaml']},
           entry_points={'console_scripts': ['powny-cli = pownycli.client:main']},
-          install_requires=['gns', 'raava', 'pyyaml', 'click>=2', 'envoy-beta', 'requests',
+          install_requires=['powny', 'pyyaml', 'click>=2', 'envoy-beta', 'requests',
                             'colorlog', 'colorama', 'tabloid'],
           tests_require=['vcrpy', 'pytest-cov'],
           cmdclass={'test': PyTest})

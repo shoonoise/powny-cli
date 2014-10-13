@@ -12,6 +12,11 @@ Powny command line tools облегчает взаимодействие с Pown
 
 `pip3 install powny-cli`
 
+Для возможности выполнять правила локально надо установить пакет `powny-yans`:
+
+`pip3 install --extra-index-url http://pypi.yandex-team.ru/simple powny-yans`
+
+
 > Утилита протестированна *только* с python >= 3.3
 
 Рекомендуется устанавливать в `virtualenv`.
@@ -26,24 +31,9 @@ Powny command line tools облегчает взаимодействие с Pown
 
 - `cd ${target_path}`
 
-- `git checkout ${branch}` (опционально)
+- `git checkout ${branch}` (опционально, если правила для целевой инсталяции powny лежат не в master ветке)
 
 После этого powny-cli будет использовать настройки, которые определены в файле `${target_path}/pownyrules.yaml`.
-
-При установке с пакетом поставляется конфиг по умолчанию (сейчас используется только для настроек логгирования).
-Чтобы внести изменения в конфигурацию, необходимые опции можно переписать в файле `~/.config/powny-cli/config.yaml`,
-или передать опцию `powny-cli --config=my_config.yaml`.
-
-Можно использовать опцию `--debug` для более подробного вывода. По умолчанию, уровень логгирования `INFO`.
-
-Опции, предназначенные для файлов, могут быть выставленны в `-`, в таком случае, вместо файла будет читаться `stdin`.
-
-
-*Например:*
-
-```bash
-cat event.json |  powny-cli powny --api-url=http://powny-testing.example.net send-event --file -
-```
 
 Что умеет powny-cli
 -------
@@ -128,6 +118,10 @@ DEBUG:pownyhelpers.output.via_email:Sending email to: ['alexanderk@example-team.
 INFO:pownyhelpers.output.via_email:Email sent to: ['alexanderk@example-team.ru']; cc: []
 ```
 
+Для проверки правил основанных на изменении статуса, используйте JSON файл со списком правил 
+(см. `multi_event_example.json`).
+
+
 ### Получить информацию о Powny-кластере
 
 ```bash
@@ -197,3 +191,20 @@ INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): 
 INFO:pownycli.pownyapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa8f82d
 ```
 
+Настройка
+--------
+
+При установке с пакетом поставляется конфиг по умолчанию (сейчас используется только для настроек логгирования).
+Чтобы внести изменения в конфигурацию, необходимые опции можно переписать в файле `~/.config/powny-cli/config.yaml`,
+или передать опцию `powny-cli --config=my_config.yaml`.
+
+Можно использовать опцию `--debug` для более подробного вывода. По умолчанию, уровень логгирования `INFO`.
+
+Опции, предназначенные для файлов, могут быть выставленны в `-`, в таком случае, вместо файла будет читаться `stdin`.
+
+
+*Например:*
+
+```bash
+cat event.json |  powny-cli powny --api-url=http://powny-testing.example.net send-event --file -
+```

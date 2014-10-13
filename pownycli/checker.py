@@ -1,79 +1,106 @@
-import os
-import uuid
-import sys
-import raava
+import logging
+from pownycli import pownyapi
+from powny.core import context, apps, tools, rules
+from powny.core.backends import CasNoValue, CasNoValueError, CasData, CasVersionError
 
-from raava.rules import get_handlers
-from raava.rules import EventRoot
-from raava.handlers import Loader
-from gns.env import setup_config
+logger = logging.getLogger(__name__)
 
 
 class PownyCheckerException(Exception):
     pass
 
 
-def __monkey_patch():
-    """
-    Patch raava worker to avoid import issue
-    """
-    class Mock():
+class FakeCas:
+    data = {}
 
-        def __init__(self):
-            pass
+    @classmethod
+    def replace_value(cls, path, value=CasNoValue, version=None,
+                      default=CasNoValue, fatal_write=True):
+        old = cls.data.get(path)
+        if old is None:
+            if default is CasNoValue:
+                raise CasNoValueError()
+            old = CasData(value=default, version=None, stored=None)
+        else:
+            old = CasData(
+                value=old["value"],
+                version=old["version"],
+                stored=tools.from_isotime(old["stored"]),
+            )
+        if value is not CasNoValue:
+            if version is not None and old.version is not None and version <= old.version:
+                write_ok = False
+                msg = "Can't rewrite '{}' with version {} (old version: {})".format(path, version, old.version)
+                if fatal_write:
+                    raise CasVersionError(msg)
+                else:
+                    logger.debug(msg)
+            else:
+                cls.data[path] = {
+                    "value": value,
+                    "version": version,
+                    "stored": tools.make_isotime(),
+                }
+                write_ok = True
+        else:
+            write_ok = None
+        return old, write_ok
 
-        def checkpoint(self):
-            pass
 
-        def get_current_task(self):
-            return self
+class FakeContext:
+    def __init__(self):
+        self.number = 0
+        self.old_value = None
+        self.value = None
 
-    raava.worker = Mock()
+    def get_extra(self):
+        return {'number': self.number}
+
+    def get_job_id(self):
+        return str(self.number)
+
+    def save(self):
+        pass
+
+    @staticmethod
+    def get_cas_storage():
+        return FakeCas
 
 
-def _import_module(path_to_module: str):
-    """
-    Import modules from path
-    returns set of functions named 'on_event'
-    which fined in path
-    """
-    checked_fn_name = 'on_event'
-    abspath_to_module = os.path.abspath(path_to_module)
-    sys.path.append(abspath_to_module)
-    loader = Loader(abspath_to_module, [checked_fn_name])
-    functions_to_check = loader.get_handlers('').get(checked_fn_name)
-    if not functions_to_check:
-        raise PownyCheckerException("Can't find function {name}".format(name=checked_fn_name))
+def _build_events(event_desc):
+    events = []
+    if type(event_desc) is list:
+        for event in event_desc:
+            if 'description' not in event:
+                event['description'] = ''
+            logger.info("Add event: %s", event)
+            events.append(event)
     else:
-        return functions_to_check
+        events.append(event_desc)
+    return events
 
 
-def _get_event_root(event_desc: dict):
-    """
-    Return event object, which Powny expected
-    """
-    event = EventRoot()
-    event.set_extra({'handler': 'on_event',
-                     'job_id': str(uuid.uuid4()),
-                     'counter': 0})
-
-    event.update(event_desc)
-    return event
+def _get_cluster_config(powny_server: str):
+    config = pownyapi.get_cluster_config(powny_server)
+    return config
 
 
-def check(config: dict, rule_path: str, event_desc: dict):
-    """
-    Search for functions in Powny, which mapped for this event
-    and execute it
-    """
-    setup_config(config)
-    __monkey_patch()
-    event_root = _get_event_root(event_desc)
-    on_event_fn = _import_module(rule_path)
+def check(config: dict, event_desc):
+    cluster_config = _get_cluster_config(config.get('powny_api_url'))
+    cluster_config['logging'] = config.get('logging')
+    apps.init('powny', 'local', args=[], raw_config=cluster_config)
 
-    matched_tasks = get_handlers(event_root, {'on_event': on_event_fn})
-    for task in matched_tasks:
-        try:
-            task(event_root)
-        except Exception as error:
-            raise PownyCheckerException("Can't execute rule {}, by reason: {}".format(task, error))
+    context.get_context = FakeContext
+
+    exposed, errors = tools.make_loader('rules').get_exposed(config['rules-path'])
+
+    for module in errors:
+        logger.error("Can't load %s module by reason %s", module, errors[module])
+
+    for event in _build_events(event_desc):
+        for (name, handler) in exposed.get("handlers", {}).items():
+            if rules.check_match(handler, event):
+                try:
+                    handler(**event)
+                except Exception as error:
+                    logger.exception("Can't execute %s rule by reason %s", name, error)

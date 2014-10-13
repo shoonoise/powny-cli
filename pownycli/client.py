@@ -159,7 +159,7 @@ def execute(event_desc, event_args):
     event = event_desc or _get_event_from_args(event_args)
 
     config = Settings.config
-    checker.check(config, Settings.get('rules_path'), event)
+    checker.check(config, event)
 
 
 @cli.group()
