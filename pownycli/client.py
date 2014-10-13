@@ -66,6 +66,7 @@ def _get_event_from_args(event_args):
               callback=_validate_repo_path, default=gitapi.get_root(fallback="."), help="Path to rules dir")
 @click.option('--config', '-c', callback=Settings.load, type=click.File('r'),
               help="Load config from file", metavar='PATH')
+@click.version_option()
 def cli(debug, work_dir, config):
     """
     Powny command line tool.
