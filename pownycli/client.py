@@ -113,6 +113,7 @@ def open_log_page(browser):
     Open kibana logs dashboard in browser.
     """
     url = Settings.get("kibana_dashboard_url")
+    click.echo("Try to open {}".format(url))
 
     try:
         if browser:
