@@ -69,14 +69,20 @@ class FakeContext:
 
 def _build_events(event_desc):
     events = []
-    if type(event_desc) is list:
-        for event in event_desc:
-            if 'description' not in event:
-                event['description'] = ''
-            logger.info("Add event: %s", event)
-            events.append(event)
-    else:
+    event_type = type(event_desc)
+
+    if event_type is list:
+        events.extend(event_desc)
+    elif event_type is dict:
         events.append(event_desc)
+    else:
+        raise PownyCheckerException("Event description should be array "
+                                    "of events or event object. Not {}".format(event_type))
+    for event in events:
+        if 'description' not in event:
+            event['description'] = ''
+        logger.info("Add event: %s", event)
+
     return events
 
 
