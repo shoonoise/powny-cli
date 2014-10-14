@@ -1,7 +1,12 @@
 language: python
 python:
-  - 3.3
-  - 3.4
+    - 3.3
+    - 3.4
+env:
+    matrix:
+        - TOXENV=flake8
+        - TOXENV=pylint
+        - TOXENV=pytest
 install:
     - pip install tox
 script:
