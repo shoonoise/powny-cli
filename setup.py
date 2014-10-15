@@ -33,8 +33,8 @@ if __name__ == '__main__':
           url='https://github.com/yandex-sysmon/powny-cli',
           packages=['pownycli'],
           package_data={'pownycli': ['config.yaml']},
-          entry_points={'console_scripts': ['powny-cli = pownycli.client:main']},
-          install_requires=['powny', 'pyyaml', 'click>=2', 'envoy-beta', 'requests',
+          entry_points={'console_scripts': ['powny = pownycli.client:main']},
+          install_requires=['powny>=1.0.0', 'pyyaml', 'click>=2', 'envoy-beta', 'requests',
                             'colorlog', 'colorama', 'tabloid'],
           tests_require=['vcrpy', 'pytest-cov'],
           cmdclass={'test': PyTest})

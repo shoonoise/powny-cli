@@ -95,6 +95,7 @@ def upload(powny_server: str, path: str, force: bool):
     and POST new HEAD hash to Powny via API
     """
     status = _execute_git_command('status --porcelain', path, "Can't get git status")
+    current_branch = _get_current_branch(path)
 
     if len(status) > 0:
         logger.info("You have uncommited changes in working directory. Please commit them before upload.")
@@ -102,16 +103,16 @@ def upload(powny_server: str, path: str, force: bool):
 
     logger.info("Pull changes from rules server...")
 
-    _execute_git_command('pull --rebase', path, "Can't pull changes from server rules")
+    _execute_git_command('pull --rebase origin {}'.format(current_branch), path,
+                         "Can't pull changes from server rules")
 
     logger.info("Sync you changes with rules server...")
 
-    cmd = 'push --force' if force else 'push'
-    _execute_git_command(cmd, path, "Can't push your changes")
+    cmd = 'push --force origin {}' if force else 'push origin {}'
+    _execute_git_command(cmd.format(current_branch), path, "Can't push your changes")
 
     powny_repos = Settings.get("powny_git_remotes")
     assert powny_repos, "Powny git remotes does not defined. Can't upload rules."
-    current_branch = _get_current_branch(path)
     for repo in powny_repos:
         logger.info("Upload rules to {}...".format(repo))
         cmd = 'push --force {} {}:master' if force else 'push {} {}:master'
