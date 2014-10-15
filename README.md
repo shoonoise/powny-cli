@@ -8,7 +8,30 @@ Powny command line tools облегчает взаимодействие с Pown
 
 Установка
 -------
-В общем случае, должно быть достаточно выполнить:
+
+**Зависимости:**
+> Ubuntu
+
+`sudo apt-get install python3-pip`
+
+> OS X
+
+Если у вас стоит [brew](http://brew.sh/):
+
+`brew install python3`
+
+В противном случае, python3 можно скачать с [сайта](https://www.python.org/download).
+
+Так же необходимо поставить `pip3`:
+
+```bash
+curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
+sudo python3 get-pip.py
+```
+
+**Установка powny-cli**
+
+На любой системе достаточно выполнить:
 
 `pip3 install powny-cli`
 
@@ -16,10 +39,6 @@ Powny command line tools облегчает взаимодействие с Pown
 
 `pip3 install --extra-index-url http://pypi.yandex-team.ru/simple powny-yans`
 
-
-> Утилита протестированна *только* с python >= 3.3
-
-Рекомендуется устанавливать в `virtualenv`.
 
 *Утилита тянет с собой не мало зависимостей (в основном, для локального выполнения правил), будьте к этому готовы*
 
@@ -56,7 +75,7 @@ $ vim rules/on_event_bar.py
 + Чтобы загрузить правила в Powny, выполните:
 
 ```bash
-$ powny-cli rules upload
+$ powny rules upload
 ```
 
 > Эта команда пытается синхронизировать ваши изменения с удалённым репозиторием правил, с которым вы работаете.
@@ -89,7 +108,7 @@ $ cat event.json
 Чтобы выполнить правило запустите:
 
 ```bash
-$ powny-cli --debug rules exec -e event.json
+$ powny rules exec -e event.json
 ```
 
 *Output:*
@@ -125,7 +144,7 @@ INFO:pownyhelpers.output.via_email:Email sent to: ['alexanderk@example-team.ru']
 ### Получить информацию о Powny-кластере
 
 ```bash
-$ powny-cli cluster-info
+$ powny cluster-info
 ```
 
 *Output:*
@@ -159,13 +178,13 @@ INFO:requests.packages.urllib3.connectionpool:Starting new HTTP connection (1): 
 ### Получить список активных заданий
 
 ```bash
-$ powny-cli job list
+$ powny job list
 ```
 
 ### Остановить задачу по UUID
 
 ```bash
-$ powny-cli job kill _JOB_UUID_
+$ powny job kill _JOB_UUID_
 ```
 
 
@@ -174,13 +193,13 @@ $ powny-cli job kill _JOB_UUID_
 Если событие простое (состоит из полей `host`, `service`, `status`), то описание может быть переданно как аргументы:
 
 ```bash
-$ powny-cli job send-event http://example.com golem CRIT
+$ powny job send-event http://example.com golem CRIT
 ```
 
 Так же, событие может быть описано в файле, который задаётся опцией `--file`:
 
 ```bash
-$ powny-cli job send-event --file event.json
+$ powny job send-event --file event.json
 ```
 
 *Output:*
@@ -196,7 +215,7 @@ INFO:pownycli.pownyapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa
 
 При установке с пакетом поставляется конфиг по умолчанию (сейчас используется только для настроек логгирования).
 Чтобы внести изменения в конфигурацию, необходимые опции можно переписать в файле `~/.config/powny-cli/config.yaml`,
-или передать опцию `powny-cli --config=my_config.yaml`.
+или передать опцию `powny --config=my_config.yaml`.
 
 Можно использовать опцию `--debug` для более подробного вывода. По умолчанию, уровень логгирования `INFO`.
 
@@ -206,5 +225,5 @@ INFO:pownycli.pownyapi:New event posted. Job Id: ec975edd-5403-44f1-8997-96d3caa
 *Например:*
 
 ```bash
-cat event.json |  powny-cli powny --api-url=http://powny-testing.example.net send-event --file -
+cat event.json |  powny powny --api-url=http://powny-testing.example.net send-event --file -
 ```

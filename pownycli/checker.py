@@ -67,23 +67,12 @@ class FakeContext:
         return FakeCas
 
 
-def _build_events(event_desc):
-    events = []
-    event_type = type(event_desc)
-
-    if event_type is list:
-        events.extend(event_desc)
-    elif event_type is dict:
-        events.append(event_desc)
-    else:
-        raise PownyCheckerException("Event description should be array "
-                                    "of events or event object. Not {}".format(event_type))
-    for event in events:
+def _build_events(events_desc):
+    for event in events_desc:
         if 'description' not in event:
             event['description'] = ''
         logger.info("Add event: %s", event)
-
-    return events
+        yield event
 
 
 def _get_cluster_config(powny_server: str):
@@ -91,7 +80,7 @@ def _get_cluster_config(powny_server: str):
     return config
 
 
-def check(config: dict, event_desc):
+def check(config: dict, events_desc):
     cluster_config = _get_cluster_config(config.get('powny_api_url'))
     cluster_config['logging'] = config.get('logging')
     apps.init('powny', 'local', args=[], raw_config=cluster_config)
@@ -103,7 +92,7 @@ def check(config: dict, event_desc):
     for module in errors:
         logger.error("Can't load %s module by reason %s", module, errors[module])
 
-    for event in _build_events(event_desc):
+    for event in _build_events(events_desc):
         for (name, handler) in exposed.get("handlers", {}).items():
             if rules.check_match(handler, event):
                 try:

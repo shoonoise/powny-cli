@@ -1,5 +1,4 @@
 [
  {"host":"xxx", "service":"100", "status":"OK", "description":"test"},
- {"host":"xxx", "service":"100", "status":"WARN", "description":"test"}
+ {"host":"xxx", "service":"100", "status":"WARN", "description":""}
 ]
-
