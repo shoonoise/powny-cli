@@ -275,6 +275,8 @@ def send_event(event_args, file):
     events = file or _get_event_from_args(event_args)
 
     for event in events:
+        if 'description' not in event:
+            event['description'] = ''
         logger.info("Send event: {}".format(event))
         pownyapi.send_event(Settings.get('powny_api_url'), event)
 

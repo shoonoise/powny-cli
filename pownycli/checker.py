@@ -1,5 +1,6 @@
 import logging
 from pownycli import pownyapi
+from pownycli.settings import Settings
 from powny.core import context, apps, tools, rules
 from powny.core.backends import CasNoValue, CasNoValueError, CasData, CasVersionError
 
@@ -80,9 +81,8 @@ def _get_cluster_config(powny_server: str):
     return config
 
 
-def check(config: dict, events_desc):
-    cluster_config = _get_cluster_config(config.get('powny_api_url'))
-    cluster_config['logging'] = config.get('logging')
+def check(config, events_desc):
+    cluster_config = Settings.merge(config, _get_cluster_config(config.get('powny_api_url')))
     apps.init('powny', 'local', args=[], raw_config=cluster_config)
 
     context.get_context = FakeContext

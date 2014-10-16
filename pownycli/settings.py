@@ -20,6 +20,18 @@ class Settings:
         else:
             raise RuntimeError("powny-cli misconfigured.")
 
+    @staticmethod
+    def merge(config, update, paths=None):
+        if paths is None:
+            paths = []
+        for key in update:
+            if key in config:
+                if isinstance(config[key], dict) and isinstance(update[key], dict):
+                    Settings.merge(config[key], update[key], list(paths) + [str(key)])
+                    continue
+            config[key] = update[key]
+        return config
+
     @classmethod
     def load(cls, ctx, param, file):
         """This callback loads config from file, if option `--config/-c` is defined,
@@ -27,9 +39,9 @@ class Settings:
         if file:
             logger.debug("Load config from %s", file)
             added_config = yaml.load(file) or {}
-            cls.config.update(added_config)
+            cls.merge(cls.config, added_config)
         else:
-            cls.config = yaml.load(resource_stream(__name__, 'config.yaml'))
+            cls.merge(cls.config, yaml.load(resource_stream(__name__, 'config.yaml')))
             logger.debug("Load default config")
             path_to_user_config = os.path.expanduser('~/.config/powny-cli/config.yaml')
             if os.path.exists(path_to_user_config):
@@ -39,4 +51,4 @@ class Settings:
                 except (TypeError, ValueError) as error:
                     logger.warning("Can't load user config. %s", error)
                 else:
-                    cls.config.update(user_conf)
+                    cls.merge(cls.config, user_conf)
