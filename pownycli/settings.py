@@ -15,7 +15,7 @@ class Settings:
         if cls.config:
             value = cls.config.get(key, default)
             if value is None:
-                logger.debug("{} set to None. May be powny-cli misconfigured".format(key))
+                raise RuntimeError("{} set to None. It's required option.".format(key))
             return value
         else:
             raise RuntimeError("powny-cli misconfigured.")
