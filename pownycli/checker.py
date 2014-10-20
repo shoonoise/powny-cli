@@ -83,11 +83,11 @@ def _get_cluster_config(powny_server: str):
 
 def check(config, events_desc):
     cluster_config = Settings.merge(config, _get_cluster_config(config.get('powny_api_url')))
-    apps.init('powny', 'local', args=[], raw_config=cluster_config)
+    apps.init('powny', 'local', args=None, raw_config=cluster_config)
 
     context.get_context = FakeContext
 
-    exposed, errors = tools.make_loader('rules').get_exposed(config['rules-path'])
+    exposed, errors = tools.make_loader(config.get('rules-path')).get_exposed(config['rules-path'])
 
     for module in errors:
         logger.error("Can't load %s module by reason %s", module, errors[module])
