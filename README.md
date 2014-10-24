@@ -25,7 +25,7 @@ Powny command line tools облегчает взаимодействие с Pown
 Так же необходимо поставить `pip3`:
 
 ```bash
-curl -O https://raw.github.com/pypa/pip/master/contrib/get-pip.py
+curl -OL https://raw.github.com/pypa/pip/master/contrib/get-pip.py
 sudo python3 get-pip.py
 ```
 
